@@ -1,8 +1,8 @@
 {
-  "name": "typescript-action",
-  "version": "0.0.0",
-  "private": true,
-  "description": "TypeScript template action",
+  "name": "example_checker",
+  "version": "0.0.1",
+  "private": false,
+  "description": "Action to cross reference examples in source code, README.md and Cargo.toml to ensure they contain the same info.",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -15,14 +15,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/Weibye/example_checker.git"
   },
+  "bugs": {
+    "url": "https://github.com/Weibye/example_checker/issues"
+  },
+  "homepage": "https://github.com/Weibye/example_checker#readme",
   "keywords": [
     "actions",
     "node",
     "setup"
   ],
-  "author": "",
+  "author": "Andreas Weibye",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.6"

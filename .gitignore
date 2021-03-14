@@ -97,3 +97,7 @@ Thumbs.db
 # Ignore built ts files
 __tests__/runner/*
 lib/**/*
+
+# Specific for this project
+Cargo.toml
+examples/*

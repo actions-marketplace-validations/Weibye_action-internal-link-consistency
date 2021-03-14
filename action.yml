@@ -1,8 +1,8 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'example_checker'
+description: 'Action to cross reference examples in source code, README.md and Cargo.toml to ensure they contain the same info.'
+author: 'Andreas Weibye'
 inputs:
-  milliseconds: # change this
+  inputname: # change this
     required: true
     description: 'input description here'
     default: 'default value if applicable'
