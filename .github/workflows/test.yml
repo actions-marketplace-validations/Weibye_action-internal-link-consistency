@@ -21,4 +21,5 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ./
         with:
-          milliseconds: 1000
+          source_path: '__tests__/testData/examples/'
+          target_paths: '{["__tests__/testData/examples/ios/", "__tests__/testData/examples/excludefolder/"]}'
