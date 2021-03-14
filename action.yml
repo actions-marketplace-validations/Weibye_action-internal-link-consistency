@@ -9,7 +9,7 @@ inputs:
   target_paths:
     required: true
     description: 
-    default: '{['Cargo.toml', 'examples/README.md']}'
+    default: '{["Cargo.toml", "examples/README.md"]}'
 runs:
   using: 'node12'
   main: 'dist/index.js'
