@@ -133,10 +133,7 @@ function GetExamplesFromReadme(path, excludeFiles, excludeFolders) {
                 // Ensure we construct an absolute path to the file
                 let absolutePath = relativePath;
                 for (let index = 1; index < filePath.length; index++) {
-                    absolutePath +=
-                        index === filePath.length - 1
-                            ? filePath[index]
-                            : `${filePath[index]}/`;
+                    absolutePath += index === filePath.length - 1 ? filePath[index] : `${filePath[index]}/`;
                 }
                 const example = {
                     name: exampleRawData[1],
@@ -201,16 +198,10 @@ const ReadmeExamples_1 = __webpack_require__(56);
 // Config
 const sourcePath = '__tests__/testData/examples/';
 const whiteListFileTypes = (/* unused pure expression or super */ null && (['.rs'])); // If this is empty, look for all files
-const targetsPaths = [
-    '__tests__/testData/Cargo.toml',
-    '__tests__/testData/examples/README.md'
-];
+const targetsPaths = ['__tests__/testData/Cargo.toml', '__tests__/testData/examples/README.md'];
 const pathToReadme = `${sourcePath}README.md`;
 const pathToCargo = 'Cargo.toml';
-const foldersToExclude = [
-    '__tests__/testData/examples/ios/',
-    '__tests__/testData/examples/excludefolder/'
-];
+const foldersToExclude = ['__tests__/testData/examples/ios/', '__tests__/testData/examples/excludefolder/'];
 const filesToExclude = ['lib.rs'];
 // Not needed when we move to target approach
 const checkReadme = true;
@@ -256,9 +247,7 @@ function run() {
             }
             // Get examples listed in the Cargo.toml
             console.log('======= CARGO =======');
-            const cargoExamples = checkCargo
-                ? CargoExamples_1.GetExamplesFromCargo(targetsPaths[0], filesToExclude, foldersToExclude)
-                : [];
+            const cargoExamples = checkCargo ? CargoExamples_1.GetExamplesFromCargo(targetsPaths[0], filesToExclude, foldersToExclude) : [];
             if (cargoExamples.length > 0) {
                 console.log(`Found ${cargoExamples.length} examples in ${pathToCargo}`);
                 // for (const example of cargoExamples) {
@@ -271,9 +260,7 @@ function run() {
             }
             // Get examples listed in the README
             console.log('======= README =======');
-            const readmeExamples = checkReadme
-                ? ReadmeExamples_1.GetExamplesFromReadme(targetsPaths[1], filesToExclude, foldersToExclude)
-                : [];
+            const readmeExamples = checkReadme ? ReadmeExamples_1.GetExamplesFromReadme(targetsPaths[1], filesToExclude, foldersToExclude) : [];
             if (readmeExamples.length > 0) {
                 console.log(`Found ${readmeExamples.length} examples in ${pathToReadme}`);
                 // for (const example of readmeExamples) {

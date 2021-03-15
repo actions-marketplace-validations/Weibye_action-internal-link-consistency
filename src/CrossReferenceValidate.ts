@@ -1,70 +1,62 @@
-import {FileData} from './FileData'
+import { FileData } from './FileData';
 
-export function CrossReference(
-  diskExamples: FileData[],
-  cargoExamples: FileData[],
-  readmeExamples: FileData[]
-): void {
-  // let issueList = new Array()
+export function CrossReference(diskExamples: FileData[], cargoExamples: FileData[], readmeExamples: FileData[]): void {
+    // let issueList = new Array()
 
-  for (const diskEntry of diskExamples) {
-    let cargoEntry = undefined
-    if (cargoExamples.length > 0) {
-      cargoEntry = FindMatchingElement(diskEntry, cargoExamples)
-      if (cargoEntry !== null) {
-        cargoExamples.splice(cargoEntry.index, 1)
-        if (cargoEntry.match.name !== diskEntry.name) {
-          console.log(
-            `Issue: Cargo name does not match: 
+    for (const diskEntry of diskExamples) {
+        let cargoEntry = undefined;
+        if (cargoExamples.length > 0) {
+            cargoEntry = FindMatchingElement(diskEntry, cargoExamples);
+            if (cargoEntry !== null) {
+                cargoExamples.splice(cargoEntry.index, 1);
+                if (cargoEntry.match.name !== diskEntry.name) {
+                    console.log(
+                        `Issue: Cargo name does not match: 
                         \nSource name: ${diskEntry.name} : Target name: ${cargoEntry.match.name}`
-          )
-        }
-        if (cargoEntry.match.path !== diskEntry.path) {
-          console.log(
-            `Issue: Cargo path does not match: 
+                    );
+                }
+                if (cargoEntry.match.path !== diskEntry.path) {
+                    console.log(
+                        `Issue: Cargo path does not match: 
                         \nSource path: ${diskEntry.path} : Target path: ${cargoEntry.match.path}`
-          )
+                    );
+                }
+            }
         }
-      }
-    }
 
-    let readmeEntry = undefined
-    if (readmeExamples.length > 0) {
-      readmeEntry = FindMatchingElement(diskEntry, readmeExamples)
-      if (readmeEntry !== null) {
-        readmeExamples.splice(readmeEntry.index, 1)
-        if (readmeEntry.match.name !== diskEntry.name) {
-          console.log(
-            `Issue: Readme name does not match: 
+        let readmeEntry = undefined;
+        if (readmeExamples.length > 0) {
+            readmeEntry = FindMatchingElement(diskEntry, readmeExamples);
+            if (readmeEntry !== null) {
+                readmeExamples.splice(readmeEntry.index, 1);
+                if (readmeEntry.match.name !== diskEntry.name) {
+                    console.log(
+                        `Issue: Readme name does not match: 
                         \nSource name: ${diskEntry.name} : Target name: ${readmeEntry.match.name}`
-          )
-        }
-        if (readmeEntry.match.path !== diskEntry.path) {
-          console.log(
-            `Issue: Readme path does not match: 
+                    );
+                }
+                if (readmeEntry.match.path !== diskEntry.path) {
+                    console.log(
+                        `Issue: Readme path does not match: 
                         \nSource path: ${diskEntry.path} : Target path: ${readmeEntry.match.path}`
-          )
+                    );
+                }
+            }
         }
-      }
     }
-  }
 
-  if (cargoExamples.length > 0) {
-    for (const leftOverCargoEntry of cargoExamples) {
-      console.log(
-        `Issue: Entry found in Cargo but not in source: ${leftOverCargoEntry.path}`
-      )
+    if (cargoExamples.length > 0) {
+        for (const leftOverCargoEntry of cargoExamples) {
+            console.log(`Issue: Entry found in Cargo but not in source: ${leftOverCargoEntry.path}`);
+        }
     }
-  }
 
-  if (readmeExamples.length > 0) {
-    for (const leftOverReadme of readmeExamples) {
-      console.log(
-        `Issue: Entry found in Readme but not in source: ${leftOverReadme.path}`
-      )
+    if (readmeExamples.length > 0) {
+        for (const leftOverReadme of readmeExamples) {
+            console.log(`Issue: Entry found in Readme but not in source: ${leftOverReadme.path}`);
+        }
     }
-  }
-  // return issueList
+    // return issueList
 }
 
 // function GetValidFlags(
@@ -197,17 +189,12 @@ export function CrossReference(
 // }
 // }
 
-function FindMatchingElement(
-  data: FileData,
-  listToSearchThrough: FileData[]
-): {match: FileData; index: number} | null {
-  const match =
-    listToSearchThrough.find(e => e.path === data.path) ??
-    listToSearchThrough.find(e => e.name === data.name)
-  if (match !== undefined) {
-    const index = listToSearchThrough.indexOf(match)
-    return {match, index}
-  } else {
-    return null
-  }
+function FindMatchingElement(data: FileData, listToSearchThrough: FileData[]): { match: FileData; index: number } | null {
+    const match = listToSearchThrough.find(e => e.path === data.path) ?? listToSearchThrough.find(e => e.name === data.name);
+    if (match !== undefined) {
+        const index = listToSearchThrough.indexOf(match);
+        return { match, index };
+    } else {
+        return null;
+    }
 }
