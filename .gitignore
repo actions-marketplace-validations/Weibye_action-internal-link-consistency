@@ -101,3 +101,4 @@ lib/**/*
 # Specific for this project
 Cargo.toml
 examples/*
+.vs

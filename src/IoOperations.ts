@@ -1,10 +1,10 @@
-import fs from "fs";
+import {readFileSync, existsSync} from 'fs'
 
-export function IsValidPath(path: string) : boolean {
-    return fs.existsSync(path);
+export function IsValidPath(path: string): boolean {
+  return existsSync(path)
 }
 
-export function ReadFileFromPath(path: string) {
-    const content: string = fs.readFileSync(path, { encoding: 'utf8' });
-    return JSON.stringify(content);
+export function ReadFileFromPath(path: string): string {
+  const content: string = readFileSync(path, {encoding: 'utf8'})
+  return JSON.stringify(content)
 }

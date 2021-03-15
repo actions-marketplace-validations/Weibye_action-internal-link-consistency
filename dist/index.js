@@ -3,10 +3,164 @@ require('./sourcemap-register.js');module.exports =
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 841:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GetExamplesFromCargo = void 0;
+const IoOperations_1 = __webpack_require__(222);
+function GetExamplesFromCargo(path, ignoreFiles, ignoreFolders) {
+    const rawData = IoOperations_1.ReadFileFromPath(path);
+    const examplePattern = /(?<=\[\[example\]\]).+?name\s=\s\\"(.+?)\\".+?path\s=\s\\"(.+?)\\"/gm;
+    const matches = rawData.matchAll(examplePattern);
+    const outputData = [];
+    for (const match of matches) {
+        const file = match[2].split('/');
+        outputData.push({
+            name: match[1],
+            fileName: file[file.length - 1],
+            path: match[2]
+        });
+    }
+    return outputData;
+}
+exports.GetExamplesFromCargo = GetExamplesFromCargo;
+
+
+/***/ }),
+
+/***/ 580:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GetExamplesFromDisk = void 0;
+const fs_1 = __webpack_require__(747);
+function GetExamplesFromDisk(path, excludeFiles, excludeDirs) {
+    let filesInDirectories = [];
+    const dirs = fs_1.readdirSync(path, { withFileTypes: true });
+    for (const element of dirs) {
+        if (element.isDirectory()) {
+            if (excludeDirs.some(e => e === path + element.name)) {
+                console.log(`Folder excluded: ${path}${element.name}`);
+                continue;
+            }
+            filesInDirectories = filesInDirectories.concat(GetExamplesFromDisk(`${path}${element.name}/`, excludeFiles, excludeDirs));
+        }
+        else {
+            // Don't look for files that should be excluded
+            if (!excludeFiles.some(e => e === element.name)) {
+                // Make sure the file is an .rs file
+                const elementNameSplit = element.name.split('.');
+                if (elementNameSplit[elementNameSplit.length - 1] === 'rs') {
+                    const result = path.split('/');
+                    const name = elementNameSplit[0];
+                    const category = result[result.length - 2];
+                    const example = {
+                        name,
+                        fileName: element.name,
+                        path: path + element.name,
+                        category
+                    };
+                    filesInDirectories.push(example);
+                }
+            }
+            else {
+                console.log(`File excluded: ${path}${element.name}`);
+            }
+        }
+    }
+    return filesInDirectories;
+}
+exports.GetExamplesFromDisk = GetExamplesFromDisk;
+
+
+/***/ }),
+
+/***/ 222:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ReadFileFromPath = exports.IsValidPath = void 0;
+const fs_1 = __webpack_require__(747);
+function IsValidPath(path) {
+    return fs_1.existsSync(path);
+}
+exports.IsValidPath = IsValidPath;
+function ReadFileFromPath(path) {
+    const content = fs_1.readFileSync(path, { encoding: 'utf8' });
+    return JSON.stringify(content);
+}
+exports.ReadFileFromPath = ReadFileFromPath;
+
+
+/***/ }),
+
+/***/ 56:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GetExamplesFromReadme = void 0;
+const IoOperations_1 = __webpack_require__(222);
+function GetExamplesFromReadme(path, excludeFiles, excludeFolders) {
+    const output = [];
+    const pathElements = path.split('/');
+    let relativePath = '';
+    for (let index = 0; index < pathElements.length - 1; index++) {
+        relativePath += `${pathElements[index]}/`;
+    }
+    // console.log(relativePath);
+    const data = IoOperations_1.ReadFileFromPath(path);
+    const regex = /(?<=(E|e)xample\s\|\s((F|f)ile|(M|m)ain)\s\|\s(D|d)escription\\r\\n-{3}\s\|\s-{3}\s\|\s-{3}\\r\\n)(.*?)(?=\\r\\n\\r\\n#)/gm;
+    // Splits the README into sections based on the tables listing examples
+    const sections = [];
+    const sectionMatches = data.matchAll(regex);
+    for (const match of sectionMatches) {
+        sections.push(match[0]);
+    }
+    const sectionSplit = /\\r\\n/;
+    const sectionRegex = /`(.+?)`\s\|\s.*?`(.+?)`.*\((.+?)\)\s\|\s(.*?)$/gm;
+    // further parse the sections into individual examples
+    for (const section of sections) {
+        const splitStrings = section.split(sectionSplit);
+        for (const string of splitStrings) {
+            const result = string.matchAll(sectionRegex);
+            for (const exampleRawData of result) {
+                const filePath = exampleRawData[3].split('/');
+                // Ensure we construct an absolute path to the file
+                let absolutePath = relativePath;
+                for (let index = 1; index < filePath.length; index++) {
+                    absolutePath +=
+                        index === filePath.length - 1
+                            ? filePath[index]
+                            : `${filePath[index]}/`;
+                }
+                const example = {
+                    name: exampleRawData[1],
+                    fileName: filePath[filePath.length - 1],
+                    path: absolutePath,
+                    description: exampleRawData[4]
+                };
+                output.push(example);
+                // console.log(example);
+            }
+        }
+    }
+    return output;
+}
+exports.GetExamplesFromReadme = GetExamplesFromReadme;
+
+
+/***/ }),
+
 /***/ 109:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
+// eslint:disable: no-console
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
@@ -37,16 +191,106 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__webpack_require__(186));
-const wait_1 = __webpack_require__(817);
+// const github = require('@actions/github');
+const CargoExamples_1 = __webpack_require__(841);
+const DiskExamples_1 = __webpack_require__(580);
+const IoOperations_1 = __webpack_require__(222);
+const ReadmeExamples_1 = __webpack_require__(56);
+// import { wait } from './wait'
+// Make sure all source files
+// Config
+const sourcePath = '__tests__/testData/examples/';
+const whiteListFileTypes = (/* unused pure expression or super */ null && (['.rs'])); // If this is empty, look for all files
+const targetsPaths = [
+    '__tests__/testData/Cargo.toml',
+    '__tests__/testData/examples/README.md'
+];
+const pathToReadme = `${sourcePath}README.md`;
+const pathToCargo = 'Cargo.toml';
+const foldersToExclude = [
+    '__tests__/testData/examples/ios/',
+    '__tests__/testData/examples/excludefolder/'
+];
+const filesToExclude = ['lib.rs'];
+// Not needed when we move to target approach
+const checkReadme = true;
+const checkCargo = true;
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const ms = core.getInput('milliseconds');
-            core.debug(`Waiting ${ms} milliseconds ...`); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-            core.debug(new Date().toTimeString());
-            yield wait_1.wait(parseInt(ms, 10));
-            core.debug(new Date().toTimeString());
-            core.setOutput('time', new Date().toTimeString());
+            console.log('Getting input');
+            console.log(`Source Path: ${core.getInput('source_path')}`);
+            console.log(`Target Path: ${core.getInput('target_paths')}`);
+            console.log('======= Starting Job =======');
+            if (!checkCargo && !checkReadme) {
+                core.setFailed('Error with configuration: Both Cargo and README checks are disabled meaning this script will do nothing. At least one should be enabled');
+                return;
+            }
+            // Check that the example directory exists
+            if (!IoOperations_1.IsValidPath(sourcePath)) {
+                core.setFailed(`Examples directory not found: ${sourcePath}`);
+                return;
+            }
+            // Check that the Cargo.toml exist
+            if (checkCargo && !IoOperations_1.IsValidPath(targetsPaths[0])) {
+                core.setFailed(`Cargo.toml not found: ${targetsPaths[0]}`);
+                return;
+            }
+            // Check that the readme exists
+            if (checkReadme && !IoOperations_1.IsValidPath(targetsPaths[1])) {
+                core.setFailed(`Examples README not found: ${targetsPaths[1]}`);
+                return;
+            }
+            // Collect the data from the various sources and normalize them for comparison
+            // Get examples from directories
+            console.log('======= DISK =======');
+            const diskExamples = DiskExamples_1.GetExamplesFromDisk(sourcePath, filesToExclude, foldersToExclude);
+            if (diskExamples.length > 0) {
+                console.log(`Found ${diskExamples.length} examples in ${sourcePath}`);
+                // for (const example of diskExamples) {
+                //     console.log(example);
+                // }
+            }
+            else {
+                core.setFailed('Found no examples on disk');
+            }
+            // Get examples listed in the Cargo.toml
+            console.log('======= CARGO =======');
+            const cargoExamples = checkCargo
+                ? CargoExamples_1.GetExamplesFromCargo(targetsPaths[0], filesToExclude, foldersToExclude)
+                : [];
+            if (cargoExamples.length > 0) {
+                console.log(`Found ${cargoExamples.length} examples in ${pathToCargo}`);
+                // for (const example of cargoExamples) {
+                //     console.log(example);
+                // }
+            }
+            else {
+                if (checkCargo)
+                    core.setFailed('Found no examples in Cargo.toml');
+            }
+            // Get examples listed in the README
+            console.log('======= README =======');
+            const readmeExamples = checkReadme
+                ? ReadmeExamples_1.GetExamplesFromReadme(targetsPaths[1], filesToExclude, foldersToExclude)
+                : [];
+            if (readmeExamples.length > 0) {
+                console.log(`Found ${readmeExamples.length} examples in ${pathToReadme}`);
+                // for (const example of readmeExamples) {
+                //     console.log(example);
+                // }
+            }
+            else {
+                if (checkReadme)
+                    core.setFailed('Found no examples in README');
+            }
+            // console.log("======= Cross referencing issues =======");
+            // const issues = CrossReference(diskExamples, cargoExamples, readmeExamples);
+            // if (issues.length > 0) {
+            //     for (const issue of issues) {
+            //         console.log(issue);
+            //     }
+            // }
         }
         catch (error) {
             core.setFailed(error.message);
@@ -54,36 +298,6 @@ function run() {
     });
 }
 run();
-
-
-/***/ }),
-
-/***/ 817:
-/***/ (function(__unused_webpack_module, exports) {
-
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.wait = void 0;
-function wait(milliseconds) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return new Promise(resolve => {
-            if (isNaN(milliseconds)) {
-                throw new Error('milliseconds not a number');
-            }
-            setTimeout(() => resolve('done!'), milliseconds);
-        });
-    });
-}
-exports.wait = wait;
 
 
 /***/ }),
