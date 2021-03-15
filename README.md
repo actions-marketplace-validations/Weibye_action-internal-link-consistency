@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/actions/example_checker/actions"><img alt="example_checker status" src="https://github.com/actions/example_checker/workflows/build-test/badge.svg"></a>
+  <a href="https://github.com/Weibye/example_checker/actions"><img alt="example_checker status" src="https://github.com/Weibye/example_checker/workflows/build-test/badge.svg"></a>
 </p>
 
 # Bevy Example checker action
