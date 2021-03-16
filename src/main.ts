@@ -7,6 +7,8 @@ import { GetExamplesFromDisk } from './DiskExamples';
 import { FileData } from './FileData';
 import { IsValidPath } from './IoOperations';
 import { GetExamplesFromReadme } from './ReadmeExamples';
+
+import { defaultSource, defaultTargets } from './Defaults';
 // import { wait } from './wait'
 
 // Make sure all source files
@@ -28,24 +30,28 @@ const filesToExclude = ['lib.rs'];
 const checkReadme = true;
 const checkCargo = true;
 
+const testString = '{ "targets": ["__tests__/testData/Cargo.toml", "__tests__/testData/examples/README.md"]}';
+
 async function run(): Promise<void> {
     try {
         console.log('======= Getting inputs =======');
         const sourceInput = core.getInput('source');
         if (sourceInput === undefined || sourceInput === '') {
-            source = sourcePathDefault;
+            source = defaultSource;
         } else {
             source = sourceInput;
         }
-        console.log(`Source: ${source}`);
+        console.log(`Source: ${defaultSource}`);
 
         const targetsInput = core.getInput('targets');
         if (targetsInput === undefined || targetsInput === '') {
-            targets = targetPathDefault;
+            targets = defaultTargets;
         } else {
-            targets = JSON.parse(targetsInput);
+            targets = JSON.parse(targetsInput).targets;
         }
-        console.log(`Targets: ${targets}`);
+        console.log(`Targets: ${defaultTargets}`);
+
+        console.log(JSON.parse(testString));
 
         // console.log(`Target Path: ${core.getInput('target_paths')}`);
         // const targets = JSON.parse(core.getInput('target_paths'));

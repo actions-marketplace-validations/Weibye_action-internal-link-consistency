@@ -4,6 +4,7 @@ on: # rebuild any PRs and main branch changes
   push:
     branches:
       - main
+      - dev
       - 'releases/*'
 
 jobs:
@@ -22,4 +23,4 @@ jobs:
       - uses: ./
         with:
           source: '__tests__/testData/examples/'
-          targets: '{["__tests__/testData/Cargo.toml", "__tests__/testData/examples/README.md"]}'
+          targets: '{ "targets": ["__tests__/testData/Cargo.toml", "__tests__/testData/examples/README.md"]}'
