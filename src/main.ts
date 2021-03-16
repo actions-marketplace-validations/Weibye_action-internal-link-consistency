@@ -8,15 +8,15 @@ import { FileData } from './FileData';
 import { IsValidPath } from './IoOperations';
 import { GetExamplesFromReadme } from './ReadmeExamples';
 
-import { defaultSource, defaultTargets } from './Defaults';
+import { defaultFileTypes, defaultSource, defaultTargets } from './Defaults';
 // import { wait } from './wait'
 
 // Make sure all source files
 let source: string;
 let targets: string[];
+let fileTypes: string[];
 
 // Config
-const sourcePathDefault = 'examples/';
 const whiteListFileTypes = ['.rs']; // If this is empty, look for all files
 const targetPathDefault = ['__tests__/testData/Cargo.toml', '__tests__/testData/examples/README.md'];
 
@@ -30,8 +30,6 @@ const filesToExclude = ['lib.rs'];
 const checkReadme = true;
 const checkCargo = true;
 
-const testString = '{ "targets": ["__tests__/testData/Cargo.toml", "__tests__/testData/examples/README.md"]}';
-
 async function run(): Promise<void> {
     try {
         console.log('======= Getting inputs =======');
@@ -41,7 +39,7 @@ async function run(): Promise<void> {
         } else {
             source = sourceInput;
         }
-        console.log(`Source: ${defaultSource}`);
+        console.log(`Source: ${source}`);
 
         const targetsInput = core.getInput('targets');
         if (targetsInput === undefined || targetsInput === '') {
@@ -49,13 +47,15 @@ async function run(): Promise<void> {
         } else {
             targets = JSON.parse(targetsInput).targets;
         }
-        console.log(`Targets: ${defaultTargets}`);
+        console.log(`Targets: ${targets}`);
 
-        console.log(JSON.parse(testString));
-
-        // console.log(`Target Path: ${core.getInput('target_paths')}`);
-        // const targets = JSON.parse(core.getInput('target_paths'));
-        // console.log(`Targets: ${targets}`);
+        const fileTypesInput = core.getInput('file-types');
+        if (fileTypesInput === undefined || fileTypesInput === '') {
+            fileTypes = defaultFileTypes;
+        } else {
+            fileTypes = JSON.parse(fileTypesInput).fileTypes;
+        }
+        console.log(`File Types: ${fileTypes}`);
         return;
 
         // console.log('======= Starting Job =======');

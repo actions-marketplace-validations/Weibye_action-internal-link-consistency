@@ -4,12 +4,16 @@ author: 'Andreas Weibye'
 inputs:
   source:
     required: true
-    description: 'path to source to be scanned'
+    description: 'path to source folder to be scanned, relative to the root of the repo'
     default: 'examples/'
   targets:
     required: true
     description: 'Some description'
-    default: '{["Cargo.toml", "examples/README.md"]}'
+    default: '{ "targets": ["examples/README.md"] }'
+  file-types:
+    required: true
+    description: 'description'
+    default: '{ "fileTypes": [".rs"] }'
 runs:
   using: 'node12'
   main: 'dist/index.js'

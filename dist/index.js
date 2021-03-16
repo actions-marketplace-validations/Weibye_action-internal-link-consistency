@@ -8,9 +8,10 @@ require('./sourcemap-register.js');module.exports =
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.defaultTargets = exports.defaultSource = void 0;
-exports.defaultSource = 'examples/';
-exports.defaultTargets = ['examples/README.md'];
+exports.defaultFileTypes = exports.defaultTargets = exports.defaultSource = void 0;
+exports.defaultSource = 'deffy/';
+exports.defaultTargets = ['deffy/README.md'];
+exports.defaultFileTypes = ['.yx'];
 
 
 /***/ }),
@@ -55,8 +56,8 @@ const Defaults_1 = __webpack_require__(26);
 // Make sure all source files
 let source;
 let targets;
+let fileTypes;
 // Config
-const sourcePathDefault = 'examples/';
 const whiteListFileTypes = (/* unused pure expression or super */ null && (['.rs'])); // If this is empty, look for all files
 const targetPathDefault = (/* unused pure expression or super */ null && (['__tests__/testData/Cargo.toml', '__tests__/testData/examples/README.md']));
 // const pathToReadme = `${sourcePath}README.md`;
@@ -66,7 +67,6 @@ const filesToExclude = (/* unused pure expression or super */ null && (['lib.rs'
 // Not needed when we move to target approach
 const checkReadme = true;
 const checkCargo = true;
-const testString = '{ "targets": ["__tests__/testData/Cargo.toml", "__tests__/testData/examples/README.md"]}';
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -78,7 +78,7 @@ function run() {
             else {
                 source = sourceInput;
             }
-            console.log(`Source: ${Defaults_1.defaultSource}`);
+            console.log(`Source: ${source}`);
             const targetsInput = core.getInput('targets');
             if (targetsInput === undefined || targetsInput === '') {
                 targets = Defaults_1.defaultTargets;
@@ -86,11 +86,15 @@ function run() {
             else {
                 targets = JSON.parse(targetsInput).targets;
             }
-            console.log(`Targets: ${Defaults_1.defaultTargets}`);
-            console.log(JSON.parse(testString));
-            // console.log(`Target Path: ${core.getInput('target_paths')}`);
-            // const targets = JSON.parse(core.getInput('target_paths'));
-            // console.log(`Targets: ${targets}`);
+            console.log(`Targets: ${targets}`);
+            const fileTypesInput = core.getInput('file-types');
+            if (fileTypesInput === undefined || fileTypesInput === '') {
+                fileTypes = Defaults_1.defaultFileTypes;
+            }
+            else {
+                fileTypes = JSON.parse(fileTypesInput).fileTypes;
+            }
+            console.log(`File Types: ${fileTypes}`);
             return;
             // console.log('======= Starting Job =======');
             // if (!checkCargo && !checkReadme) {

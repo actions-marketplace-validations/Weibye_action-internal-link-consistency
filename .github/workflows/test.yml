@@ -24,3 +24,4 @@ jobs:
         with:
           source: '__tests__/testData/examples/'
           targets: '{ "targets": ["__tests__/testData/Cargo.toml", "__tests__/testData/examples/README.md"]}'
+          file-types: '{ "fileTypes": [".rs"] }'
