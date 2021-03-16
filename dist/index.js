@@ -16,6 +16,74 @@ exports.defaultFileTypes = ['.yx'];
 
 /***/ }),
 
+/***/ 580:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GetExamplesFromDisk = void 0;
+const fs_1 = __webpack_require__(747);
+function GetExamplesFromDisk(path, excludeFiles, excludeDirs) {
+    let filesInDirectories = [];
+    const dirs = fs_1.readdirSync(path, { withFileTypes: true });
+    for (const element of dirs) {
+        if (element.isDirectory()) {
+            if (excludeDirs.some(e => e === path + element.name)) {
+                console.log(`Folder excluded: ${path}${element.name}`);
+                continue;
+            }
+            filesInDirectories = filesInDirectories.concat(GetExamplesFromDisk(`${path}${element.name}/`, excludeFiles, excludeDirs));
+        }
+        else {
+            // Don't look for files that should be excluded
+            if (!excludeFiles.some(e => e === element.name)) {
+                // Make sure the file is an .rs file
+                const elementNameSplit = element.name.split('.');
+                if (elementNameSplit[elementNameSplit.length - 1] === 'rs') {
+                    const result = path.split('/');
+                    const name = elementNameSplit[0];
+                    const category = result[result.length - 2];
+                    const example = {
+                        name,
+                        fileName: element.name,
+                        path: path + element.name,
+                        category
+                    };
+                    filesInDirectories.push(example);
+                }
+            }
+            else {
+                console.log(`File excluded: ${path}${element.name}`);
+            }
+        }
+    }
+    return filesInDirectories;
+}
+exports.GetExamplesFromDisk = GetExamplesFromDisk;
+
+
+/***/ }),
+
+/***/ 222:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ReadFileFromPath = exports.IsValidPath = void 0;
+const fs_1 = __webpack_require__(747);
+function IsValidPath(path) {
+    return fs_1.existsSync(path);
+}
+exports.IsValidPath = IsValidPath;
+function ReadFileFromPath(path) {
+    const content = fs_1.readFileSync(path, { encoding: 'utf8' });
+    return JSON.stringify(content);
+}
+exports.ReadFileFromPath = ReadFileFromPath;
+
+
+/***/ }),
+
 /***/ 109:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -51,25 +119,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__webpack_require__(186));
+const DiskExamples_1 = __webpack_require__(580);
+const IoOperations_1 = __webpack_require__(222);
 const Defaults_1 = __webpack_require__(26);
 // import { wait } from './wait'
-// Make sure all source files
 let source;
 let targets;
 let fileTypes;
-// Config
-const whiteListFileTypes = (/* unused pure expression or super */ null && (['.rs'])); // If this is empty, look for all files
-const targetPathDefault = (/* unused pure expression or super */ null && (['__tests__/testData/Cargo.toml', '__tests__/testData/examples/README.md']));
 // const pathToReadme = `${sourcePath}README.md`;
 const pathToCargo = 'Cargo.toml';
-const foldersToExclude = (/* unused pure expression or super */ null && (['__tests__/testData/examples/ios/', '__tests__/testData/examples/excludefolder/']));
-const filesToExclude = (/* unused pure expression or super */ null && (['lib.rs']));
+const foldersToExclude = ['__tests__/testData/examples/ios/', '__tests__/testData/examples/excludefolder/'];
+const filesToExclude = ['lib.rs'];
 // Not needed when we move to target approach
 const checkReadme = true;
 const checkCargo = true;
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            console.log('======= Starting Job =======');
             console.log('======= Getting inputs =======');
             const sourceInput = core.getInput('source');
             if (sourceInput === undefined || sourceInput === '') {
@@ -95,39 +162,39 @@ function run() {
                 fileTypes = JSON.parse(fileTypesInput).fileTypes;
             }
             console.log(`File Types: ${fileTypes}`);
-            return;
-            // console.log('======= Starting Job =======');
-            // if (!checkCargo && !checkReadme) {
-            //     core.setFailed('Error with configuration: Both Cargo and README checks are disabled meaning this script will do nothing. At least one should be enabled');
-            //     return;
-            // }
-            // // Check that the example directory exists
-            // if (!IsValidPath(sourcePath)) {
-            //     core.setFailed(`Examples directory not found: ${sourcePath}`);
-            //     return;
-            // }
-            // // Check that the Cargo.toml exist
-            // if (checkCargo && !IsValidPath(targetsPaths[0])) {
-            //     core.setFailed(`Cargo.toml not found: ${targetsPaths[0]}`);
-            //     return;
-            // }
-            // // Check that the readme exists
-            // if (checkReadme && !IsValidPath(targetsPaths[1])) {
-            //     core.setFailed(`Examples README not found: ${targetsPaths[1]}`);
-            //     return;
-            // }
-            // // Collect the data from the various sources and normalize them for comparison
-            // // Get examples from directories
-            // console.log('======= DISK =======');
-            // const diskExamples: FileData[] = GetExamplesFromDisk(sourcePath, filesToExclude, foldersToExclude);
-            // if (diskExamples.length > 0) {
-            //     console.log(`Found ${diskExamples.length} examples in ${sourcePath}`);
-            //     // for (const example of diskExamples) {
-            //     //     console.log(example);
-            //     // }
-            // } else {
-            //     core.setFailed('Found no examples on disk');
-            // }
+            console.log('======= Config sanity checks =======');
+            if (source === null || source === undefined) {
+                core.setFailed(`Config error: Source directory not defined`);
+                return;
+            }
+            // Check that the source directory exists
+            if (!IoOperations_1.IsValidPath(source)) {
+                core.setFailed(`Source directory not found: ${source}`);
+                return;
+            }
+            if (targets === null || targets === undefined || targets.length < 1) {
+                core.setFailed(`Config error: No targets defined`);
+                return;
+            }
+            for (const target of targets) {
+                if (!IoOperations_1.IsValidPath(target)) {
+                    core.setFailed(`Target not found: ${target}`);
+                    return;
+                }
+            }
+            // Collect the data from the various sources and normalize them for comparison
+            // Get examples from directories
+            console.log('======= Getting source data =======');
+            const sourceData = DiskExamples_1.GetExamplesFromDisk(source, filesToExclude, foldersToExclude);
+            if (sourceData.length > 0) {
+                console.log(`Found ${sourceData.length} entries in ${source}`);
+                // for (const example of diskExamples) {
+                //     console.log(example);
+                // }
+            }
+            else {
+                core.setFailed('Found no entries in source');
+            }
             // // Get examples listed in the Cargo.toml
             // console.log('======= CARGO =======');
             // const cargoExamples: FileData[] = checkCargo ? GetExamplesFromCargo(targetsPaths[0], filesToExclude, foldersToExclude) : [];
