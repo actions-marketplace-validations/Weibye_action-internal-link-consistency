@@ -2,11 +2,11 @@ name: 'example_checker'
 description: 'Action to cross reference examples in source code, README.md and Cargo.toml to ensure they contain the same info.'
 author: 'Andreas Weibye'
 inputs:
-  source_path:
+  source:
     required: true
     description: 'path to source to be scanned'
     default: 'examples/'
-  target_paths:
+  targets:
     required: true
     description: 'Some description'
     default: '{["Cargo.toml", "examples/README.md"]}'
