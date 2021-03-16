@@ -99,6 +99,4 @@ __tests__/runner/*
 lib/**/*
 
 # Specific for this project
-Cargo.toml
-examples/*
 .vs
