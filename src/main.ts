@@ -12,15 +12,15 @@ import { GetExamplesFromReadme } from './ReadmeExamples';
 // Make sure all source files
 
 // Config
-const sourcePath = '__tests__/testData/examples/';
-const whiteListFileTypes: string[] = ['.rs']; // If this is empty, look for all files
+let sourcePath = 'examples/';
+const whiteListFileTypes = ['.rs']; // If this is empty, look for all files
 const targetsPaths = ['__tests__/testData/Cargo.toml', '__tests__/testData/examples/README.md'];
 
 const pathToReadme = `${sourcePath}README.md`;
 const pathToCargo = 'Cargo.toml';
 
-const foldersToExclude: string[] = ['__tests__/testData/examples/ios/', '__tests__/testData/examples/excludefolder/'];
-const filesToExclude: string[] = ['lib.rs'];
+const foldersToExclude = ['__tests__/testData/examples/ios/', '__tests__/testData/examples/excludefolder/'];
+const filesToExclude = ['lib.rs'];
 
 // Not needed when we move to target approach
 const checkReadme = true;
@@ -28,9 +28,15 @@ const checkCargo = true;
 
 async function run(): Promise<void> {
     try {
+        console.log('======= Starting Job =======');
+
         console.log('Getting input');
-        console.log(`Source Path: ${core.getInput('source_path')}`);
+        
+        sourcePath = core.getInput('source_path');
+        console.log(`Source Path: ${sourcePath}`);
         console.log(`Target Path: ${core.getInput('target_paths')}`);
+        const targets = JSON.parse(core.getInput('target_paths'));
+        console.log(`Targets: ${targets}`);
 
         console.log('======= Starting Job =======');
 

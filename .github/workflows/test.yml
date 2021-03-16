@@ -22,4 +22,4 @@ jobs:
       - uses: ./
         with:
           source_path: '__tests__/testData/examples/'
-          target_paths: '{["__tests__/testData/examples/ios/", "__tests__/testData/examples/excludefolder/"]}'
+          target_paths: '{["__tests__/testData/Cargo.toml", "__tests__/testData/examples/README.md"]}'
