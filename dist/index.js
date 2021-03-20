@@ -3,63 +3,222 @@ require('./sourcemap-register.js');module.exports =
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 26:
+/***/ 295:
 /***/ ((__unused_webpack_module, exports) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.defaultFileTypes = exports.defaultTargets = exports.defaultSource = void 0;
-exports.defaultSource = 'deffy/';
-exports.defaultTargets = ['deffy/README.md'];
-exports.defaultFileTypes = ['.yx'];
+exports.LinkStyle = exports.Target = exports.Config = void 0;
+class Config {
+    constructor(source, whitelistFileTypes, excludeFolders, excludeFiles, targets) {
+        this.Source = source;
+        this.WhitelistFileTypes = whitelistFileTypes;
+        this.ExcludeFolders = excludeFolders;
+        this.ExcludeFiles = excludeFiles;
+        this.Targets = targets;
+    }
+    /**
+     * ToString
+     */
+    ToString() {
+        let output = '';
+        output += `\tSource: ${this.Source}\n`;
+        output += `\tWhitelist: ${this.WhitelistFileTypes}\n`;
+        output += `\tExcludeFolders: ${this.ExcludeFolders}\n`;
+        output += `\tExcludeFiles: ${this.ExcludeFiles}\n`;
+        for (const target of this.Targets) {
+            output += `\tTarget: ${target.Path} | ${target.Style}\n`;
+        }
+        return output;
+    }
+}
+exports.Config = Config;
+class Target {
+    constructor(path, linkStyle) {
+        this.Path = path;
+        this.Style = linkStyle;
+    }
+}
+exports.Target = Target;
+var LinkStyle;
+(function (LinkStyle) {
+    LinkStyle[LinkStyle["Markdown"] = 0] = "Markdown";
+    LinkStyle[LinkStyle["TOML_Path_Value"] = 1] = "TOML_Path_Value";
+})(LinkStyle = exports.LinkStyle || (exports.LinkStyle = {}));
 
 
 /***/ }),
 
-/***/ 580:
+/***/ 26:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GetExamplesFromDisk = void 0;
-const fs_1 = __webpack_require__(747);
-function GetExamplesFromDisk(path, excludeFiles, excludeDirs) {
-    let filesInDirectories = [];
-    const dirs = fs_1.readdirSync(path, { withFileTypes: true });
-    for (const element of dirs) {
-        if (element.isDirectory()) {
-            if (excludeDirs.some(e => e === path + element.name)) {
-                console.log(`Folder excluded: ${path}${element.name}`);
-                continue;
-            }
-            filesInDirectories = filesInDirectories.concat(GetExamplesFromDisk(`${path}${element.name}/`, excludeFiles, excludeDirs));
+exports.defaultTargets = exports.defaultExcludeFolders = exports.defaultExcludeFiles = exports.defaultFileTypes = exports.defaultSource = void 0;
+const Config_1 = __webpack_require__(295);
+exports.defaultSource = '__tests__/testData/examples/';
+exports.defaultFileTypes = [
+    'rs',
+    'ico'
+];
+exports.defaultExcludeFiles = [
+    '__tests__/testData/examples/also_decoy.rs'
+];
+exports.defaultExcludeFolders = [
+    '__tests__/testData/examples/decoy',
+    '__tests__/testData/examples/excludefolder'
+];
+exports.defaultTargets = [
+    { Path: '__tests__/testData/examples/README.md', Style: Config_1.LinkStyle.Markdown }
+];
+
+
+/***/ }),
+
+/***/ 119:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.FileDetails = void 0;
+class FileDetails {
+    constructor(path) {
+        this.SourcePath = path;
+        this.FileName = this.GetFileName(path);
+        this.Extension = this.GetFileExtension(path);
+        this.Path = this.GetPathToFile(path);
+        // console.log(`Name:${this.FileName}`);
+        // console.log(`Extension:${this.Extension}`);
+        // console.log(`Path:${this.Path}`);
+    }
+    GetPathToFile(path) {
+        const regex = /^(.+\/)*([^\/]+)*$/gm;
+        const result = regex.exec(path);
+        if (result !== null && result !== undefined && result.length > 0) {
+            return result[1];
+        }
+        return '';
+    }
+    GetFileName(path) {
+        const regex = /^(.+\/)*([^\/]+)*$/gm;
+        const result = regex.exec(path);
+        if (result !== null && result !== undefined && result.length > 0) {
+            return result[2];
+        }
+        return '';
+    }
+    GetFileExtension(path) {
+        const regex = /(?:\.([^.]+))?$/; // Capture file extensions
+        const result = regex.exec(path);
+        if (result !== null && result !== undefined && result.length > 0) {
+            return result[1];
         }
         else {
-            // Don't look for files that should be excluded
-            if (!excludeFiles.some(e => e === element.name)) {
-                // Make sure the file is an .rs file
-                const elementNameSplit = element.name.split('.');
-                if (elementNameSplit[elementNameSplit.length - 1] === 'rs') {
-                    const result = path.split('/');
-                    const name = elementNameSplit[0];
-                    const category = result[result.length - 2];
-                    const example = {
-                        name,
-                        fileName: element.name,
-                        path: path + element.name,
-                        category
-                    };
-                    filesInDirectories.push(example);
-                }
-            }
-            else {
-                console.log(`File excluded: ${path}${element.name}`);
-            }
+            return '';
         }
     }
-    return filesInDirectories;
 }
-exports.GetExamplesFromDisk = GetExamplesFromDisk;
+exports.FileDetails = FileDetails;
+
+
+/***/ }),
+
+/***/ 835:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.IncludeFolder = exports.IncludeFile = void 0;
+function IncludeFile(fileDetails, config) {
+    return !ExcludeFile(fileDetails.Path, config.ExcludeFiles) && WhitelistedType(fileDetails.Extension, config.WhitelistFileTypes);
+}
+exports.IncludeFile = IncludeFile;
+function IncludeFolder(path, config) {
+    return !ExcludeDirectory(path, config.ExcludeFolders);
+}
+exports.IncludeFolder = IncludeFolder;
+function WhitelistedType(extension, types) {
+    if (types.length < 1)
+        return true;
+    return types.some(e => e === extension);
+}
+function ExcludeFile(filePath, excludeFiles) {
+    return excludeFiles.some(e => e === filePath);
+}
+function ExcludeDirectory(dirPath, excludeDirs) {
+    return excludeDirs.some(e => e === dirPath);
+}
+
+
+/***/ }),
+
+/***/ 366:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ParseTargets = exports.ParseInputArray = exports.ParseInput = void 0;
+const core = __importStar(__webpack_require__(186));
+function ParseInput(inputName) {
+    const input = core.getInput(inputName);
+    if (input === undefined || input === '') {
+        console.log(`Config Error: Unable to get config input ${inputName}`); // Using defaults
+        return undefined;
+    }
+    else {
+        return input;
+    }
+}
+exports.ParseInput = ParseInput;
+function ParseInputArray(inputName) {
+    let result;
+    const input = ParseInput(inputName);
+    if (input === undefined)
+        return undefined;
+    try {
+        result = JSON.parse(input);
+        return result;
+    }
+    catch (_a) {
+        core.setFailed(`Config Error: Unable to parse array input ${inputName}`);
+        return undefined;
+    }
+}
+exports.ParseInputArray = ParseInputArray;
+function ParseTargets(inputName) {
+    let result;
+    const input = ParseInput(inputName);
+    if (input === undefined)
+        return undefined;
+    try {
+        result = JSON.parse(input);
+        return result;
+    }
+    catch (_a) {
+        core.setFailed(`Config Error: Unable to parse target array input ${inputName}`);
+        return undefined;
+    }
+}
+exports.ParseTargets = ParseTargets;
 
 
 /***/ }),
@@ -80,6 +239,112 @@ function ReadFileFromPath(path) {
     return JSON.stringify(content);
 }
 exports.ReadFileFromPath = ReadFileFromPath;
+
+
+/***/ }),
+
+/***/ 275:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Setup = void 0;
+const core = __importStar(__webpack_require__(186));
+const Config_1 = __webpack_require__(295);
+const Defaults_1 = __webpack_require__(26);
+const InputParser_1 = __webpack_require__(366);
+const IoOperations_1 = __webpack_require__(222);
+class Setup {
+    constructor() {
+        var _a, _b, _c, _d, _e;
+        const source = (_a = InputParser_1.ParseInput('source')) !== null && _a !== void 0 ? _a : Defaults_1.defaultSource;
+        const whitelistedExtensions = (_b = InputParser_1.ParseInputArray('file-types')) !== null && _b !== void 0 ? _b : Defaults_1.defaultFileTypes;
+        const excludeFolders = (_c = InputParser_1.ParseInputArray('exclude-folders')) !== null && _c !== void 0 ? _c : Defaults_1.defaultExcludeFolders;
+        const excludeFiles = (_d = InputParser_1.ParseInputArray('exclude-files')) !== null && _d !== void 0 ? _d : Defaults_1.defaultExcludeFiles;
+        const targets = (_e = InputParser_1.ParseTargets('targets')) !== null && _e !== void 0 ? _e : Defaults_1.defaultTargets;
+        console.log('======= Config checks =======');
+        if (source === null || source === undefined) {
+            core.setFailed(`Config error: Source directory not defined`);
+            process.exit(1);
+        }
+        // Check that the source directory exists
+        if (!IoOperations_1.IsValidPath(source)) {
+            core.setFailed(`Source directory not found: ${source}`);
+            process.exit(1);
+        }
+        if (targets === null || targets === undefined || targets.length < 1) {
+            core.setFailed(`Config error: No targets defined`);
+            process.exit(1);
+        }
+        for (const target of targets) {
+            if (!IoOperations_1.IsValidPath(target.Path)) {
+                core.setFailed(`Target not found: ${target.Path}`);
+                process.exit(1);
+            }
+            if (!Object.values(Config_1.LinkStyle).includes(target.Style)) {
+                core.setFailed(`Invalid Style not found: ${target.Style}`);
+                process.exit(1);
+            }
+        }
+        this.Config = new Config_1.Config(source, whitelistedExtensions, excludeFolders, excludeFiles, targets);
+    }
+}
+exports.Setup = Setup;
+
+
+/***/ }),
+
+/***/ 14:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GetSourceData = void 0;
+const fs_1 = __webpack_require__(747);
+const FileDetails_1 = __webpack_require__(119);
+const InclusionController_1 = __webpack_require__(835);
+function GetSourceData(path, config) {
+    let files = [];
+    const dirs = fs_1.readdirSync(path, { withFileTypes: true });
+    for (const element of dirs) {
+        if (element.isDirectory()) {
+            if (InclusionController_1.IncludeFolder(path + element.name, config)) {
+                files = files.concat(GetSourceData(`${path}${element.name}/`, config));
+            }
+            else {
+                console.log(`Folder excluded: ${path}${element.name}`);
+            }
+        }
+        else {
+            const fileDetails = new FileDetails_1.FileDetails(path + element.name);
+            // Only check files that are whitelisted and not excluded
+            if (InclusionController_1.IncludeFile(fileDetails, config)) {
+                files.push(fileDetails);
+            }
+        }
+    }
+    return files;
+}
+exports.GetSourceData = GetSourceData;
 
 
 /***/ }),
@@ -119,75 +384,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__webpack_require__(186));
-const DiskExamples_1 = __webpack_require__(580);
-const IoOperations_1 = __webpack_require__(222);
-const Defaults_1 = __webpack_require__(26);
-// import { wait } from './wait'
-let source;
+const SourceData_1 = __webpack_require__(14);
+const Setup_1 = __webpack_require__(275);
 let targets;
-let fileTypes;
-// const pathToReadme = `${sourcePath}README.md`;
-const pathToCargo = 'Cargo.toml';
-const foldersToExclude = ['__tests__/testData/examples/ios/', '__tests__/testData/examples/excludefolder/'];
-const filesToExclude = ['lib.rs'];
-// Not needed when we move to target approach
-const checkReadme = true;
-const checkCargo = true;
+const foldersToExclude = (/* unused pure expression or super */ null && (['__tests__/testData/examples/ios/', '__tests__/testData/examples/excludefolder/']));
+const filesToExclude = (/* unused pure expression or super */ null && (['lib.rs']));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             console.log('======= Starting Job =======');
-            console.log('======= Getting inputs =======');
-            const sourceInput = core.getInput('source');
-            if (sourceInput === undefined || sourceInput === '') {
-                source = Defaults_1.defaultSource;
-            }
-            else {
-                source = sourceInput;
-            }
-            console.log(`Source: ${source}`);
-            const targetsInput = core.getInput('targets');
-            if (targetsInput === undefined || targetsInput === '') {
-                targets = Defaults_1.defaultTargets;
-            }
-            else {
-                targets = JSON.parse(targetsInput).targets;
-            }
-            console.log(`Targets: ${targets}`);
-            const fileTypesInput = core.getInput('file-types');
-            if (fileTypesInput === undefined || fileTypesInput === '') {
-                fileTypes = Defaults_1.defaultFileTypes;
-            }
-            else {
-                fileTypes = JSON.parse(fileTypesInput).fileTypes;
-            }
-            console.log(`File Types: ${fileTypes}`);
-            console.log('======= Config sanity checks =======');
-            if (source === null || source === undefined) {
-                core.setFailed(`Config error: Source directory not defined`);
-                return;
-            }
-            // Check that the source directory exists
-            if (!IoOperations_1.IsValidPath(source)) {
-                core.setFailed(`Source directory not found: ${source}`);
-                return;
-            }
-            if (targets === null || targets === undefined || targets.length < 1) {
-                core.setFailed(`Config error: No targets defined`);
-                return;
-            }
-            for (const target of targets) {
-                if (!IoOperations_1.IsValidPath(target)) {
-                    core.setFailed(`Target not found: ${target}`);
-                    return;
-                }
-            }
-            // Collect the data from the various sources and normalize them for comparison
+            console.log('======= Getting config =======');
+            const config = new Setup_1.Setup().Config;
+            console.log(`Running job with config: \n${config.ToString()}`);
             // Get examples from directories
             console.log('======= Getting source data =======');
-            const sourceData = DiskExamples_1.GetExamplesFromDisk(source, filesToExclude, foldersToExclude);
+            const sourceData = SourceData_1.GetSourceData(config.Source, config);
             if (sourceData.length > 0) {
-                console.log(`Found ${sourceData.length} entries in ${source}`);
+                console.log(`Found ${sourceData.length} entries in ${config.Source}`);
                 // for (const example of diskExamples) {
                 //     console.log(example);
                 // }
@@ -195,6 +408,10 @@ function run() {
             else {
                 core.setFailed('Found no entries in source');
             }
+            // console.log('======= Getting target data =======');
+            // let targetData;
+            // for (const target of targets) {
+            // }
             // // Get examples listed in the Cargo.toml
             // console.log('======= CARGO =======');
             // const cargoExamples: FileData[] = checkCargo ? GetExamplesFromCargo(targetsPaths[0], filesToExclude, foldersToExclude) : [];
