@@ -3,87 +3,33 @@
 import * as core from '@actions/core';
 // const github = require('@actions/github');
 import { GetExamplesFromCargo } from './CargoExamples';
-import { GetExamplesFromDisk as GetSourceData } from './DiskExamples';
-import { FileData } from './FileData';
-import { IsValidPath } from './IoOperations';
 import { GetExamplesFromReadme } from './ReadmeExamples';
 
-import { defaultFileTypes, defaultSource, defaultTargets } from './Defaults';
-// import { wait } from './wait'
+import { GetSourceData } from './SourceData';
+import { FileData } from './FileData';
 
-let source: string;
+
+import { Setup } from './Setup';
+import { FileDetails } from './FileDetails';
+
 let targets: string[];
-let fileTypes: string[];
-
-// const pathToReadme = `${sourcePath}README.md`;
-const pathToCargo = 'Cargo.toml';
 
 const foldersToExclude = ['__tests__/testData/examples/ios/', '__tests__/testData/examples/excludefolder/'];
 const filesToExclude = ['lib.rs'];
 
-// Not needed when we move to target approach
-const checkReadme = true;
-const checkCargo = true;
-
 async function run(): Promise<void> {
     try {
         console.log('======= Starting Job =======');
-        console.log('======= Getting inputs =======');
+        console.log('======= Getting config =======');
 
-        const sourceInput = core.getInput('source');
-        if (sourceInput === undefined || sourceInput === '') {
-            source = defaultSource;
-        } else {
-            source = sourceInput;
-        }
-        console.log(`Source: ${source}`);
-
-        const targetsInput = core.getInput('targets');
-        if (targetsInput === undefined || targetsInput === '') {
-            targets = defaultTargets;
-        } else {
-            targets = JSON.parse(targetsInput).targets;
-        }
-        console.log(`Targets: ${targets}`);
-
-        const fileTypesInput = core.getInput('file-types');
-        if (fileTypesInput === undefined || fileTypesInput === '') {
-            fileTypes = defaultFileTypes;
-        } else {
-            fileTypes = JSON.parse(fileTypesInput).fileTypes;
-        }
-        console.log(`File Types: ${fileTypes}`);
-
-        console.log('======= Config sanity checks =======');
-        if (source === null || source === undefined) {
-            core.setFailed(`Config error: Source directory not defined`);
-            return;
-        }
-        // Check that the source directory exists
-        if (!IsValidPath(source)) {
-            core.setFailed(`Source directory not found: ${source}`);
-            return;
-        }
-
-        if (targets === null || targets === undefined || targets.length < 1) {
-            core.setFailed(`Config error: No targets defined`);
-            return;
-        }
-
-        for (const target of targets) {
-            if (!IsValidPath(target)) {
-                core.setFailed(`Target not found: ${target}`);
-                return;
-            }
-        }
-
-        // Collect the data from the various sources and normalize them for comparison
+        const config = new Setup().Config;
+        console.log(`Running job with config: \n${config.ToString()}`);
 
         // Get examples from directories
         console.log('======= Getting source data =======');
-        const sourceData: FileData[] = GetSourceData(source, filesToExclude, foldersToExclude);
+        const sourceData: FileDetails[] = GetSourceData(config.Source, config);
         if (sourceData.length > 0) {
-            console.log(`Found ${sourceData.length} entries in ${source}`);
+            console.log(`Found ${sourceData.length} entries in ${config.Source}`);
             // for (const example of diskExamples) {
             //     console.log(example);
             // }
@@ -91,6 +37,11 @@ async function run(): Promise<void> {
             core.setFailed('Found no entries in source');
         }
 
+        // console.log('======= Getting target data =======');
+        // let targetData;
+        // for (const target of targets) {
+            
+        // }
         // // Get examples listed in the Cargo.toml
         // console.log('======= CARGO =======');
         // const cargoExamples: FileData[] = checkCargo ? GetExamplesFromCargo(targetsPaths[0], filesToExclude, foldersToExclude) : [];
