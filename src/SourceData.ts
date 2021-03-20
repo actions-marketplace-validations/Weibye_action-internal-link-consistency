@@ -10,7 +10,7 @@ export function GetSourceData(path: string, config: Config): FileDetails[] {
 
     for (const element of dirs) {
         if (element.isDirectory()) {
-            if (IncludeFolder(path+element.name, config)) {
+            if (IncludeFolder(path + element.name, config)) {
                 files = files.concat(GetSourceData(`${path}${element.name}/`, config));
             } else {
                 console.log(`Folder excluded: ${path}${element.name}`);

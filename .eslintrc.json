@@ -18,10 +18,12 @@
         "import/no-namespace": "off",
         "no-unused-vars": "off",
         "@typescript-eslint/no-unused-vars": "warn",
+        "no-shadow": "off",
+        "@typescript-eslint/no-shadow": ["error"],
         "@typescript-eslint/explicit-member-accessibility": [
             "error",
             {
-                "accessibility": "no-public"
+                "accessibility": "explicit"
             }
         ],
         "@typescript-eslint/no-require-imports": "error",

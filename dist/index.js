@@ -8,7 +8,7 @@ require('./sourcemap-register.js');module.exports =
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.LinkStyle = exports.Target = exports.Config = void 0;
+exports.Config = void 0;
 class Config {
     constructor(source, whitelistFileTypes, excludeFolders, excludeFiles, targets) {
         this.Source = source;
@@ -33,18 +33,14 @@ class Config {
     }
 }
 exports.Config = Config;
-class Target {
-    constructor(path, linkStyle) {
-        this.Path = path;
-        this.Style = linkStyle;
-    }
-}
-exports.Target = Target;
-var LinkStyle;
-(function (LinkStyle) {
-    LinkStyle[LinkStyle["Markdown"] = 0] = "Markdown";
-    LinkStyle[LinkStyle["TOML_Path_Value"] = 1] = "TOML_Path_Value";
-})(LinkStyle = exports.LinkStyle || (exports.LinkStyle = {}));
+// export class Target implements ITarget {
+//     public Path: string;
+//     public Style: LinkStyle;
+//     public constructor(path: string, linkStyle: LinkStyle) {
+//         this.Path = path;
+//         this.Style = linkStyle;
+//     }
+// }
 
 
 /***/ }),
@@ -55,22 +51,12 @@ var LinkStyle;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.defaultTargets = exports.defaultExcludeFolders = exports.defaultExcludeFiles = exports.defaultFileTypes = exports.defaultSource = void 0;
-const Config_1 = __webpack_require__(295);
+const LinkStyle_1 = __webpack_require__(954);
 exports.defaultSource = '__tests__/testData/examples/';
-exports.defaultFileTypes = [
-    'rs',
-    'ico'
-];
-exports.defaultExcludeFiles = [
-    '__tests__/testData/examples/also_decoy.rs'
-];
-exports.defaultExcludeFolders = [
-    '__tests__/testData/examples/decoy',
-    '__tests__/testData/examples/excludefolder'
-];
-exports.defaultTargets = [
-    { Path: '__tests__/testData/examples/README.md', Style: Config_1.LinkStyle.Markdown }
-];
+exports.defaultFileTypes = ['rs', 'ico'];
+exports.defaultExcludeFiles = ['__tests__/testData/examples/also_decoy.rs'];
+exports.defaultExcludeFolders = ['__tests__/testData/examples/decoy', '__tests__/testData/examples/excludefolder'];
+exports.defaultTargets = [{ Path: '__tests__/testData/examples/README.md', Style: LinkStyle_1.LinkMarkdown.Markdown }];
 
 
 /***/ }),
@@ -87,12 +73,11 @@ class FileDetails {
         this.FileName = this.GetFileName(path);
         this.Extension = this.GetFileExtension(path);
         this.Path = this.GetPathToFile(path);
-        // console.log(`Name:${this.FileName}`);
-        // console.log(`Extension:${this.Extension}`);
-        // console.log(`Path:${this.Path}`);
     }
     GetPathToFile(path) {
+        /* eslint-disable no-useless-escape */
         const regex = /^(.+\/)*([^\/]+)*$/gm;
+        /* eslint-enable no-useless-escape */
         const result = regex.exec(path);
         if (result !== null && result !== undefined && result.length > 0) {
             return result[1];
@@ -100,7 +85,9 @@ class FileDetails {
         return '';
     }
     GetFileName(path) {
+        /* eslint-disable no-useless-escape */
         const regex = /^(.+\/)*([^\/]+)*$/gm;
+        /* eslint-enable no-useless-escape */
         const result = regex.exec(path);
         if (result !== null && result !== undefined && result.length > 0) {
             return result[2];
@@ -243,6 +230,21 @@ exports.ReadFileFromPath = ReadFileFromPath;
 
 /***/ }),
 
+/***/ 954:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.LinkMarkdown = void 0;
+var LinkMarkdown;
+(function (LinkMarkdown) {
+    LinkMarkdown[LinkMarkdown["Markdown"] = 0] = "Markdown";
+    LinkMarkdown[LinkMarkdown["TOML_Path_Value"] = 1] = "TOML_Path_Value";
+})(LinkMarkdown = exports.LinkMarkdown || (exports.LinkMarkdown = {}));
+
+
+/***/ }),
+
 /***/ 275:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -273,6 +275,7 @@ const Config_1 = __webpack_require__(295);
 const Defaults_1 = __webpack_require__(26);
 const InputParser_1 = __webpack_require__(366);
 const IoOperations_1 = __webpack_require__(222);
+const LinkStyle_1 = __webpack_require__(954);
 class Setup {
     constructor() {
         var _a, _b, _c, _d, _e;
@@ -300,7 +303,7 @@ class Setup {
                 core.setFailed(`Target not found: ${target.Path}`);
                 process.exit(1);
             }
-            if (!Object.values(Config_1.LinkStyle).includes(target.Style)) {
+            if (!Object.values(LinkStyle_1.LinkMarkdown).includes(target.Style)) {
                 core.setFailed(`Invalid Style not found: ${target.Style}`);
                 process.exit(1);
             }
@@ -384,11 +387,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__webpack_require__(186));
-const SourceData_1 = __webpack_require__(14);
+// const github = require('@actions/github');
+// import { GetExamplesFromCargo } from './CargoExamples';
+// import { GetExamplesFromReadme } from './ReadmeExamples';
 const Setup_1 = __webpack_require__(275);
-let targets;
-const foldersToExclude = (/* unused pure expression or super */ null && (['__tests__/testData/examples/ios/', '__tests__/testData/examples/excludefolder/']));
-const filesToExclude = (/* unused pure expression or super */ null && (['lib.rs']));
+const SourceData_1 = __webpack_require__(14);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -401,8 +404,8 @@ function run() {
             const sourceData = SourceData_1.GetSourceData(config.Source, config);
             if (sourceData.length > 0) {
                 console.log(`Found ${sourceData.length} entries in ${config.Source}`);
-                // for (const example of diskExamples) {
-                //     console.log(example);
+                // for (const data of sourceData) {
+                //     console.log(data);
                 // }
             }
             else {
@@ -447,6 +450,7 @@ function run() {
         }
     });
 }
+// eslint:enable: no-console
 run();
 
 

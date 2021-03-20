@@ -1,3 +1,5 @@
+import { ITarget } from './Interfaces';
+
 export class Config {
     public Source: string;
     public WhitelistFileTypes: string[];
@@ -5,7 +7,7 @@ export class Config {
     public ExcludeFiles: string[];
     public Targets: ITarget[];
 
-    constructor(source: string, whitelistFileTypes: string[], excludeFolders: string[], excludeFiles: string[], targets: ITarget[]) {
+    public constructor(source: string, whitelistFileTypes: string[], excludeFolders: string[], excludeFiles: string[], targets: ITarget[]) {
         this.Source = source;
         this.WhitelistFileTypes = whitelistFileTypes;
         this.ExcludeFolders = excludeFolders;
@@ -30,23 +32,12 @@ export class Config {
     }
 }
 
-export class Target implements ITarget {
+// export class Target implements ITarget {
+//     public Path: string;
+//     public Style: LinkStyle;
 
-    public Path: string;
-    public Style: LinkStyle;
-
-    constructor(path: string, linkStyle: LinkStyle) {
-        this.Path = path;
-        this.Style = linkStyle;
-    }
-}
-
-export interface ITarget {
-    Path: string;
-    Style: LinkStyle;
-}
-
-export enum LinkStyle {
-    Markdown,
-    TOML_Path_Value
-}
+//     public constructor(path: string, linkStyle: LinkStyle) {
+//         this.Path = path;
+//         this.Style = linkStyle;
+//     }
+// }

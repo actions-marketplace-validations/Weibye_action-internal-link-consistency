@@ -1,23 +1,20 @@
 export class FileDetails {
-
     public Path: string;
     public FileName: string;
     public Extension: string;
     public SourcePath: string;
 
-    constructor(path: string) {
+    public constructor(path: string) {
         this.SourcePath = path;
         this.FileName = this.GetFileName(path);
         this.Extension = this.GetFileExtension(path);
         this.Path = this.GetPathToFile(path);
-
-        // console.log(`Name:${this.FileName}`);
-        // console.log(`Extension:${this.Extension}`);
-        // console.log(`Path:${this.Path}`);
     }
 
-    GetPathToFile(path: string): string {
+    public GetPathToFile(path: string): string {
+        /* eslint-disable no-useless-escape */
         const regex = /^(.+\/)*([^\/]+)*$/gm;
+        /* eslint-enable no-useless-escape */
         const result = regex.exec(path);
         if (result !== null && result !== undefined && result.length > 0) {
             return result[1];
@@ -25,8 +22,10 @@ export class FileDetails {
         return '';
     }
 
-    GetFileName(path: string): string {
+    public GetFileName(path: string): string {
+        /* eslint-disable no-useless-escape */
         const regex = /^(.+\/)*([^\/]+)*$/gm;
+        /* eslint-enable no-useless-escape */
         const result = regex.exec(path);
         if (result !== null && result !== undefined && result.length > 0) {
             return result[2];
@@ -34,7 +33,7 @@ export class FileDetails {
         return '';
     }
 
-    GetFileExtension(path: string): string {
+    public GetFileExtension(path: string): string {
         const regex = /(?:\.([^.]+))?$/; // Capture file extensions
         const result = regex.exec(path);
         if (result !== null && result !== undefined && result.length > 0) {
