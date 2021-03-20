@@ -1,6 +1,5 @@
-import { Config } from "./Config";
-import { FileDetails } from "./FileDetails";
-
+import { Config } from './Config';
+import { FileDetails } from './FileDetails';
 
 export function IncludeFile(fileDetails: FileDetails, config: Config): boolean {
     return !ExcludeFile(fileDetails.Path, config.ExcludeFiles) && WhitelistedType(fileDetails.Extension, config.WhitelistFileTypes);

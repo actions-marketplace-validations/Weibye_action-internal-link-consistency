@@ -2,20 +2,11 @@
 
 import * as core from '@actions/core';
 // const github = require('@actions/github');
-import { GetExamplesFromCargo } from './CargoExamples';
-import { GetExamplesFromReadme } from './ReadmeExamples';
-
-import { GetSourceData } from './SourceData';
-import { FileData } from './FileData';
-
-
+// import { GetExamplesFromCargo } from './CargoExamples';
+// import { GetExamplesFromReadme } from './ReadmeExamples';
 import { Setup } from './Setup';
 import { FileDetails } from './FileDetails';
-
-let targets: string[];
-
-const foldersToExclude = ['__tests__/testData/examples/ios/', '__tests__/testData/examples/excludefolder/'];
-const filesToExclude = ['lib.rs'];
+import { GetSourceData } from './SourceData';
 
 async function run(): Promise<void> {
     try {
@@ -30,8 +21,8 @@ async function run(): Promise<void> {
         const sourceData: FileDetails[] = GetSourceData(config.Source, config);
         if (sourceData.length > 0) {
             console.log(`Found ${sourceData.length} entries in ${config.Source}`);
-            // for (const example of diskExamples) {
-            //     console.log(example);
+            // for (const data of sourceData) {
+            //     console.log(data);
             // }
         } else {
             core.setFailed('Found no entries in source');
@@ -40,7 +31,7 @@ async function run(): Promise<void> {
         // console.log('======= Getting target data =======');
         // let targetData;
         // for (const target of targets) {
-            
+
         // }
         // // Get examples listed in the Cargo.toml
         // console.log('======= CARGO =======');
@@ -78,4 +69,5 @@ async function run(): Promise<void> {
     }
 }
 
+// eslint:enable: no-console
 run();

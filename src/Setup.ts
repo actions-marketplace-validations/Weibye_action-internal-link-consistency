@@ -1,14 +1,15 @@
 import * as core from '@actions/core';
-import { Config, ITarget, LinkStyle } from './Config';
+import { Config } from './Config';
 import { defaultExcludeFiles, defaultExcludeFolders, defaultFileTypes, defaultSource, defaultTargets } from './Defaults';
 import { ParseInput, ParseInputArray, ParseTargets } from './InputParser';
+import { ITarget } from './Interfaces';
 import { IsValidPath } from './IoOperations';
+import { LinkMarkdown } from './LinkStyle';
 
 export class Setup {
-
     public Config: Config;
 
-    constructor() {
+    public constructor() {
         const source = ParseInput('source') ?? defaultSource;
         const whitelistedExtensions = ParseInputArray('file-types') ?? defaultFileTypes;
         const excludeFolders = ParseInputArray('exclude-folders') ?? defaultExcludeFolders;
@@ -37,19 +38,12 @@ export class Setup {
                 core.setFailed(`Target not found: ${target.Path}`);
                 process.exit(1);
             }
-            if (!Object.values(LinkStyle).includes(target.Style))
-            {
+            if (!Object.values(LinkMarkdown).includes(target.Style)) {
                 core.setFailed(`Invalid Style not found: ${target.Style}`);
                 process.exit(1);
             }
         }
 
-        this.Config = new Config(
-            source, 
-            whitelistedExtensions,
-            excludeFolders,
-            excludeFiles,
-            targets
-        );
+        this.Config = new Config(source, whitelistedExtensions, excludeFolders, excludeFiles, targets);
     }
 }

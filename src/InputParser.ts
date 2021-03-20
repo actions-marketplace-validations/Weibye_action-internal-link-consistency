@@ -1,5 +1,5 @@
 import * as core from '@actions/core';
-import { ITarget, Target } from './Config';
+import { ITarget } from './Interfaces';
 
 export function ParseInput(inputName: string): string | undefined {
     const input = core.getInput(inputName);
@@ -25,7 +25,7 @@ export function ParseInputArray(inputName: string): string[] | undefined {
 }
 
 export function ParseTargets(inputName: string): ITarget[] | undefined {
-    let result: Target[];
+    let result: ITarget[];
     const input = ParseInput(inputName);
     if (input === undefined) return undefined;
     try {
