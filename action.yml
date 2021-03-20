@@ -6,14 +6,22 @@ inputs:
     required: true
     description: 'path to source folder to be scanned, relative to the root of the repo'
     default: 'examples/'
+  file-types:
+    required: false
+    description: 'TODO'
+    default: '["rs"]'
+  exclude-folders:
+    required: false
+    description: 'TODO'
+    default: '[]'
+  exclude-files:
+    required: false
+    description: 'TODO'
+    default: '[]'
   targets:
     required: true
     description: 'Some description'
     default: '{ "targets": ["examples/README.md"] }'
-  file-types:
-    required: true
-    description: 'description'
-    default: '{ "fileTypes": [".rs"] }'
 runs:
   using: 'node12'
   main: 'dist/index.js'
