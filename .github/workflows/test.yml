@@ -26,5 +26,5 @@ jobs:
           file-types: '["rs", "ico"]'
           exclude-folders: '["hello/world"]'
           exclude-files: '["test/file.thing"]'
-          targets: '[ { Path: "__tests__/testData/Cargo.toml", Style: "Markdown" }, { Path: "__tests__/testData/examples/README.md", Style: "Markdown" }]'
+          targets: '[ { "Path": "__tests__/testData/Cargo.toml", "Style": "Markdown" }, { "Path": "__tests__/testData/examples/README.md", "Style": "Markdown" }]'
           
