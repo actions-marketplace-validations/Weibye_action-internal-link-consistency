@@ -3,94 +3,45 @@
 import * as core from '@actions/core';
 // const github = require('@actions/github');
 import { GetExamplesFromCargo } from './CargoExamples';
-import { GetExamplesFromDisk } from './DiskExamples';
-import { FileData } from './FileData';
-import { IsValidPath } from './IoOperations';
 import { GetExamplesFromReadme } from './ReadmeExamples';
-// import { wait } from './wait'
 
-// Make sure all source files
-let source: string;
+import { GetSourceData } from './SourceData';
+import { FileData } from './FileData';
+
+
+import { Setup } from './Setup';
+import { FileDetails } from './FileDetails';
+
 let targets: string[];
-
-// Config
-const sourcePathDefault = 'examples/';
-const whiteListFileTypes = ['.rs']; // If this is empty, look for all files
-const targetPathDefault = ['__tests__/testData/Cargo.toml', '__tests__/testData/examples/README.md'];
-
-// const pathToReadme = `${sourcePath}README.md`;
-const pathToCargo = 'Cargo.toml';
 
 const foldersToExclude = ['__tests__/testData/examples/ios/', '__tests__/testData/examples/excludefolder/'];
 const filesToExclude = ['lib.rs'];
 
-// Not needed when we move to target approach
-const checkReadme = true;
-const checkCargo = true;
-
 async function run(): Promise<void> {
     try {
-        console.log('======= Getting inputs =======');
-        const sourceInput = core.getInput('source');
-        if (sourceInput === undefined || sourceInput === '') {
-            source = sourcePathDefault;
+        console.log('======= Starting Job =======');
+        console.log('======= Getting config =======');
+
+        const config = new Setup().Config;
+        console.log(`Running job with config: \n${config.ToString()}`);
+
+        // Get examples from directories
+        console.log('======= Getting source data =======');
+        const sourceData: FileDetails[] = GetSourceData(config.Source, config);
+        if (sourceData.length > 0) {
+            console.log(`Found ${sourceData.length} entries in ${config.Source}`);
+            // for (const example of diskExamples) {
+            //     console.log(example);
+            // }
         } else {
-            source = sourceInput;
+            core.setFailed('Found no entries in source');
         }
-        console.log(`Source: ${source}`);
 
-        const targetsInput = core.getInput('targets');
-        if (targetsInput === undefined || targetsInput === '') {
-            targets = targetPathDefault;
-        } else {
-            targets = JSON.parse(targetsInput);
-        }
-        console.log(`Targets: ${targets}`);
-
-        // console.log(`Target Path: ${core.getInput('target_paths')}`);
-        // const targets = JSON.parse(core.getInput('target_paths'));
-        // console.log(`Targets: ${targets}`);
-        return;
-
-        // console.log('======= Starting Job =======');
-
-        // if (!checkCargo && !checkReadme) {
-        //     core.setFailed('Error with configuration: Both Cargo and README checks are disabled meaning this script will do nothing. At least one should be enabled');
-        //     return;
+        // console.log('======= Getting target data =======');
+        // let targetData;
+        // for (const target of targets) {
+            
         // }
-
-        // // Check that the example directory exists
-        // if (!IsValidPath(sourcePath)) {
-        //     core.setFailed(`Examples directory not found: ${sourcePath}`);
-        //     return;
-        // }
-
-        // // Check that the Cargo.toml exist
-        // if (checkCargo && !IsValidPath(targetsPaths[0])) {
-        //     core.setFailed(`Cargo.toml not found: ${targetsPaths[0]}`);
-        //     return;
-        // }
-
-        // // Check that the readme exists
-        // if (checkReadme && !IsValidPath(targetsPaths[1])) {
-        //     core.setFailed(`Examples README not found: ${targetsPaths[1]}`);
-        //     return;
-        // }
-
-        // // Collect the data from the various sources and normalize them for comparison
-
-        // // Get examples from directories
-        // console.log('======= DISK =======');
-        // const diskExamples: FileData[] = GetExamplesFromDisk(sourcePath, filesToExclude, foldersToExclude);
-        // if (diskExamples.length > 0) {
-        //     console.log(`Found ${diskExamples.length} examples in ${sourcePath}`);
-        //     // for (const example of diskExamples) {
-        //     //     console.log(example);
-        //     // }
-        // } else {
-        //     core.setFailed('Found no examples on disk');
-        // }
-
         // // Get examples listed in the Cargo.toml
         // console.log('======= CARGO =======');
         // const cargoExamples: FileData[] = checkCargo ? GetExamplesFromCargo(targetsPaths[0], filesToExclude, foldersToExclude) : [];

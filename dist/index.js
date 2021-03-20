@@ -3,29 +3,15 @@ require('./sourcemap-register.js');module.exports =
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 841:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 26:
+/***/ ((__unused_webpack_module, exports) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GetExamplesFromCargo = void 0;
-const IoOperations_1 = __webpack_require__(222);
-function GetExamplesFromCargo(path, ignoreFiles, ignoreFolders) {
-    const rawData = IoOperations_1.ReadFileFromPath(path);
-    const examplePattern = /(?<=\[\[example\]\]).+?name\s=\s\\"(.+?)\\".+?path\s=\s\\"(.+?)\\"/gm;
-    const matches = rawData.matchAll(examplePattern);
-    const outputData = [];
-    for (const match of matches) {
-        const file = match[2].split('/');
-        outputData.push({
-            name: match[1],
-            fileName: file[file.length - 1],
-            path: match[2]
-        });
-    }
-    return outputData;
-}
-exports.GetExamplesFromCargo = GetExamplesFromCargo;
+exports.defaultFileTypes = exports.defaultTargets = exports.defaultSource = void 0;
+exports.defaultSource = 'deffy/';
+exports.defaultTargets = ['deffy/README.md'];
+exports.defaultFileTypes = ['.yx'];
 
 
 /***/ }),
@@ -98,61 +84,6 @@ exports.ReadFileFromPath = ReadFileFromPath;
 
 /***/ }),
 
-/***/ 56:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GetExamplesFromReadme = void 0;
-const IoOperations_1 = __webpack_require__(222);
-function GetExamplesFromReadme(path, excludeFiles, excludeFolders) {
-    const output = [];
-    const pathElements = path.split('/');
-    let relativePath = '';
-    for (let index = 0; index < pathElements.length - 1; index++) {
-        relativePath += `${pathElements[index]}/`;
-    }
-    // console.log(relativePath);
-    const data = IoOperations_1.ReadFileFromPath(path);
-    const regex = /(?<=(E|e)xample\s\|\s((F|f)ile|(M|m)ain)\s\|\s(D|d)escription\\r\\n-{3}\s\|\s-{3}\s\|\s-{3}\\r\\n)(.*?)(?=\\r\\n\\r\\n#)/gm;
-    // Splits the README into sections based on the tables listing examples
-    const sections = [];
-    const sectionMatches = data.matchAll(regex);
-    for (const match of sectionMatches) {
-        sections.push(match[0]);
-    }
-    const sectionSplit = /\\r\\n/;
-    const sectionRegex = /`(.+?)`\s\|\s.*?`(.+?)`.*\((.+?)\)\s\|\s(.*?)$/gm;
-    // further parse the sections into individual examples
-    for (const section of sections) {
-        const splitStrings = section.split(sectionSplit);
-        for (const string of splitStrings) {
-            const result = string.matchAll(sectionRegex);
-            for (const exampleRawData of result) {
-                const filePath = exampleRawData[3].split('/');
-                // Ensure we construct an absolute path to the file
-                let absolutePath = relativePath;
-                for (let index = 1; index < filePath.length; index++) {
-                    absolutePath += index === filePath.length - 1 ? filePath[index] : `${filePath[index]}/`;
-                }
-                const example = {
-                    name: exampleRawData[1],
-                    fileName: filePath[filePath.length - 1],
-                    path: absolutePath,
-                    description: exampleRawData[4]
-                };
-                output.push(example);
-                // console.log(example);
-            }
-        }
-    }
-    return output;
-}
-exports.GetExamplesFromReadme = GetExamplesFromReadme;
-
-
-/***/ }),
-
 /***/ 109:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -188,18 +119,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__webpack_require__(186));
-// const github = require('@actions/github');
-const CargoExamples_1 = __webpack_require__(841);
 const DiskExamples_1 = __webpack_require__(580);
 const IoOperations_1 = __webpack_require__(222);
-const ReadmeExamples_1 = __webpack_require__(56);
+const Defaults_1 = __webpack_require__(26);
 // import { wait } from './wait'
-// Make sure all source files
-// Config
-const sourcePath = '__tests__/testData/examples/';
-const whiteListFileTypes = (/* unused pure expression or super */ null && (['.rs'])); // If this is empty, look for all files
-const targetsPaths = ['__tests__/testData/Cargo.toml', '__tests__/testData/examples/README.md'];
-const pathToReadme = `${sourcePath}README.md`;
+let source;
+let targets;
+let fileTypes;
+// const pathToReadme = `${sourcePath}README.md`;
 const pathToCargo = 'Cargo.toml';
 const foldersToExclude = ['__tests__/testData/examples/ios/', '__tests__/testData/examples/excludefolder/'];
 const filesToExclude = ['lib.rs'];
@@ -209,68 +136,87 @@ const checkCargo = true;
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            console.log('Getting input');
-            console.log(`Source Path: ${core.getInput('source_path')}`);
-            console.log(`Target Path: ${core.getInput('target_paths')}`);
             console.log('======= Starting Job =======');
-            if (!checkCargo && !checkReadme) {
-                core.setFailed('Error with configuration: Both Cargo and README checks are disabled meaning this script will do nothing. At least one should be enabled');
+            console.log('======= Getting inputs =======');
+            const sourceInput = core.getInput('source');
+            if (sourceInput === undefined || sourceInput === '') {
+                source = Defaults_1.defaultSource;
+            }
+            else {
+                source = sourceInput;
+            }
+            console.log(`Source: ${source}`);
+            const targetsInput = core.getInput('targets');
+            if (targetsInput === undefined || targetsInput === '') {
+                targets = Defaults_1.defaultTargets;
+            }
+            else {
+                targets = JSON.parse(targetsInput).targets;
+            }
+            console.log(`Targets: ${targets}`);
+            const fileTypesInput = core.getInput('file-types');
+            if (fileTypesInput === undefined || fileTypesInput === '') {
+                fileTypes = Defaults_1.defaultFileTypes;
+            }
+            else {
+                fileTypes = JSON.parse(fileTypesInput).fileTypes;
+            }
+            console.log(`File Types: ${fileTypes}`);
+            console.log('======= Config sanity checks =======');
+            if (source === null || source === undefined) {
+                core.setFailed(`Config error: Source directory not defined`);
                 return;
             }
-            // Check that the example directory exists
-            if (!IoOperations_1.IsValidPath(sourcePath)) {
-                core.setFailed(`Examples directory not found: ${sourcePath}`);
+            // Check that the source directory exists
+            if (!IoOperations_1.IsValidPath(source)) {
+                core.setFailed(`Source directory not found: ${source}`);
                 return;
             }
-            // Check that the Cargo.toml exist
-            if (checkCargo && !IoOperations_1.IsValidPath(targetsPaths[0])) {
-                core.setFailed(`Cargo.toml not found: ${targetsPaths[0]}`);
+            if (targets === null || targets === undefined || targets.length < 1) {
+                core.setFailed(`Config error: No targets defined`);
                 return;
             }
-            // Check that the readme exists
-            if (checkReadme && !IoOperations_1.IsValidPath(targetsPaths[1])) {
-                core.setFailed(`Examples README not found: ${targetsPaths[1]}`);
-                return;
+            for (const target of targets) {
+                if (!IoOperations_1.IsValidPath(target)) {
+                    core.setFailed(`Target not found: ${target}`);
+                    return;
+                }
             }
             // Collect the data from the various sources and normalize them for comparison
             // Get examples from directories
-            console.log('======= DISK =======');
-            const diskExamples = DiskExamples_1.GetExamplesFromDisk(sourcePath, filesToExclude, foldersToExclude);
-            if (diskExamples.length > 0) {
-                console.log(`Found ${diskExamples.length} examples in ${sourcePath}`);
+            console.log('======= Getting source data =======');
+            const sourceData = DiskExamples_1.GetExamplesFromDisk(source, filesToExclude, foldersToExclude);
+            if (sourceData.length > 0) {
+                console.log(`Found ${sourceData.length} entries in ${source}`);
                 // for (const example of diskExamples) {
                 //     console.log(example);
                 // }
             }
             else {
-                core.setFailed('Found no examples on disk');
+                core.setFailed('Found no entries in source');
             }
-            // Get examples listed in the Cargo.toml
-            console.log('======= CARGO =======');
-            const cargoExamples = checkCargo ? CargoExamples_1.GetExamplesFromCargo(targetsPaths[0], filesToExclude, foldersToExclude) : [];
-            if (cargoExamples.length > 0) {
-                console.log(`Found ${cargoExamples.length} examples in ${pathToCargo}`);
-                // for (const example of cargoExamples) {
-                //     console.log(example);
-                // }
-            }
-            else {
-                if (checkCargo)
-                    core.setFailed('Found no examples in Cargo.toml');
-            }
-            // Get examples listed in the README
-            console.log('======= README =======');
-            const readmeExamples = checkReadme ? ReadmeExamples_1.GetExamplesFromReadme(targetsPaths[1], filesToExclude, foldersToExclude) : [];
-            if (readmeExamples.length > 0) {
-                console.log(`Found ${readmeExamples.length} examples in ${pathToReadme}`);
-                // for (const example of readmeExamples) {
-                //     console.log(example);
-                // }
-            }
-            else {
-                if (checkReadme)
-                    core.setFailed('Found no examples in README');
-            }
+            // // Get examples listed in the Cargo.toml
+            // console.log('======= CARGO =======');
+            // const cargoExamples: FileData[] = checkCargo ? GetExamplesFromCargo(targetsPaths[0], filesToExclude, foldersToExclude) : [];
+            // if (cargoExamples.length > 0) {
+            //     console.log(`Found ${cargoExamples.length} examples in ${pathToCargo}`);
+            //     // for (const example of cargoExamples) {
+            //     //     console.log(example);
+            //     // }
+            // } else {
+            //     if (checkCargo) core.setFailed('Found no examples in Cargo.toml');
+            // }
+            // // Get examples listed in the README
+            // console.log('======= README =======');
+            // const readmeExamples: FileData[] = checkReadme ? GetExamplesFromReadme(targetsPaths[1], filesToExclude, foldersToExclude) : [];
+            // if (readmeExamples.length > 0) {
+            //     console.log(`Found ${readmeExamples.length} examples in ${pathToReadme}`);
+            //     // for (const example of readmeExamples) {
+            //     //     console.log(example);
+            //     // }
+            // } else {
+            //     if (checkReadme) core.setFailed('Found no examples in README');
+            // }
             // console.log("======= Cross referencing issues =======");
             // const issues = CrossReference(diskExamples, cargoExamples, readmeExamples);
             // if (issues.length > 0) {
