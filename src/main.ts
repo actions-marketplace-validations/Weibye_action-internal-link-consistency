@@ -7,11 +7,12 @@ import * as core from '@actions/core';
 import { Setup } from './Setup';
 import { FileDetails } from './FileDetails';
 import { GetSourceData } from './SourceData';
+import { GetTargetData } from './TargetData';
+import { ITargetData } from './Interfaces';
 
 async function run(): Promise<void> {
     try {
         console.log('======= Starting Job =======');
-        console.log('======= Getting config =======');
 
         const config = new Setup().Config;
         console.log(`Running job with config: \n${config.ToString()}`);
@@ -28,10 +29,17 @@ async function run(): Promise<void> {
             core.setFailed('Found no entries in source');
         }
 
-        // console.log('======= Getting target data =======');
-        // let targetData;
-        // for (const target of targets) {
+        console.log('======= Getting target data =======');
+        let targetData: ITargetData[] = [];
+        for (const target of config.Targets) {
 
+            const data = GetTargetData(target, config);
+            console.log(`Found ${data.length} entries in ${target.Path}`);
+            
+            targetData.concat(data);
+        }
+        // for (const data of targetData) {
+        //     console.log(data);
         // }
         // // Get examples listed in the Cargo.toml
         // console.log('======= CARGO =======');

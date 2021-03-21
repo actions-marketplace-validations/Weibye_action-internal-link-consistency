@@ -1,4 +1,4 @@
-export enum LinkMarkdown {
+export enum LinkStyle {
     Markdown,
     TOML_Path_Value
 }

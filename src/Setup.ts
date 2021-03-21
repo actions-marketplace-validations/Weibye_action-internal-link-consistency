@@ -4,12 +4,13 @@ import { defaultExcludeFiles, defaultExcludeFolders, defaultFileTypes, defaultSo
 import { ParseInput, ParseInputArray, ParseTargets } from './InputParser';
 import { ITarget } from './Interfaces';
 import { IsValidPath } from './IoOperations';
-import { LinkMarkdown } from './LinkStyle';
+import { LinkStyle } from './LinkStyle';
 
 export class Setup {
     public Config: Config;
 
     public constructor() {
+        console.log('======= Retrieve inputs =======');
         const source = ParseInput('source') ?? defaultSource;
         const whitelistedExtensions = ParseInputArray('file-types') ?? defaultFileTypes;
         const excludeFolders = ParseInputArray('exclude-folders') ?? defaultExcludeFolders;
@@ -28,6 +29,7 @@ export class Setup {
             process.exit(1);
         }
 
+        // Check valid targets
         if (targets === null || targets === undefined || targets.length < 1) {
             core.setFailed(`Config error: No targets defined`);
             process.exit(1);
@@ -38,7 +40,7 @@ export class Setup {
                 core.setFailed(`Target not found: ${target.Path}`);
                 process.exit(1);
             }
-            if (!Object.values(LinkMarkdown).includes(target.Style)) {
+            if (!Object.values(LinkStyle).includes(target.Style)) {
                 core.setFailed(`Invalid Style not found: ${target.Style}`);
                 process.exit(1);
             }

@@ -56,7 +56,7 @@ git checkout v0.4.0
 
 Example | Main | Description
 --- | --- | ---
-`hello_world` | [`hello_world.rs`](./hello_world.rs) | Runs a minimal example that outputs "hello world"
+`hello_world` | [`hello_world.rs`](hello_world.rs) | Runs a minimal example that outputs "hello world"
 
 # Cross-Platform Examples
 
@@ -64,7 +64,7 @@ Example | Main | Description
 
 Example | Main | Description
 --- | --- | ---
-`contributors` | [`2d/contributors.rs`](./2d/contributors.rs) | Displays each contributor as a bouncy bevy-ball!
+`contributors` | [`2d/contributors.rs`](2d/contributors.rs) | Displays each contributor as a bouncy bevy-ball!
 `sprite` | [`2d/sprite.rs`](./2d/sprite.rs) | Renders a sprite
 `sprite_sheet` | [`2d/sprite_sheet.rs`](./2d/sprite_sheet.rs) | Renders an animated sprite
 `text2d` | [`2d/text2d.rs`](./2d/text2d.rs) | Generates text in 2d
