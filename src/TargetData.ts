@@ -15,97 +15,73 @@ export function GetTargetData(target: ITarget, config: Config): ITargetData[] {
     let pattern: RegExp;
     let matches: IterableIterator<RegExpMatchArray>;
 
+    const preProcessor: { Orig: string, Link: string, Target: ITarget }[] = []
+
     switch (target.Style) {
         case LinkStyle.Markdown:
             pattern = /\[([^\[]+)\]\(([^\)]+)\)/gm;
             matches = content.matchAll(pattern);
             for (const match of matches) {
-                const link = match[2];
-                const orig = match[0];
-                if (IsValidRelativePath(link)) {
-                    const rootPath = GetRootPath(target.Path, link);
-                }
+                preProcessor.push({ Orig: match[0], Link: match[2], Target: target });
             }
+            break;
 
         case LinkStyle.TOML_Path_Value:
             pattern = /^path\s=\s"(.*)"$/gm;
             matches = content.matchAll(pattern);
             for (const match of matches) {
-                const link = match[1];
-                
-                const orig = match[0];
-                const rootPath = GetRootPath(target.Path, link);
-                console.log(`Target: ${target.Path} \nLink: ${link}\nRoot: ${rootPath}`);
-                // if ()
+                preProcessor.push({ Orig: match[0], Link: match[1], Target: target });
             }
-
-
-        // default:
-        //     return new RegExp(/.*/gm);
+            break;
+        default:
+            throw new Error('No Style defined');
     }
 
-
-
-    // const pattern = GetRelativePath(target.Style);
-
-    // const matches = content.matchAll(pattern);
-
-    for (const match of matches) {
-
-        const link = match[2];
-        console.log(match);
-        if (link === null || link === undefined) continue;
-
-        if (IsValidRelativePath(link)) {
-            const rootPath = GetRootPath(target.Path, link);
-            const fileDetails = new FileDetails(rootPath);
-            // console.log(fileDetails);
-            const targetData: ITargetData = {
-                Details: fileDetails,
-                RelativePath: link,
-                OriginalMatch: match[0],
-                ParentFile: target
-            };
-            output.push(targetData);
+    for (const data of preProcessor) {
+        if (!ExcludeLink(data.Link)) {
+            const rootPath = GetRootPath(data.Target.Path, data.Link);
+            output.push({
+                Details: new FileDetails(rootPath),
+                RelativePath: data.Link,
+                OriginalMatch: data.Orig,
+                ParentFile: data.Target
+            });
         }
     }
-
     return output;
 }
 
-// function GetRelativePath(inputContent: string, style: LinkStyle): { relativePath: string, originalMath: string } {
-//     /* eslint-disable no-useless-escape */
-//     switch (style) {
-//         case LinkStyle.Markdown:
+function ExcludeLink(link: string) : boolean {
+    // external links
+    const webLinks = /^https*:\/\//gm;
+    const webResult = webLinks.exec(link);
+    if (webResult !== null) return true;
 
-//             return /\[([^\[]+)\]\(([^\)]+)\)/gm;
-//         case LinkStyle.TOML_Path_Value:
-//             return new RegExp(/^path\s=\s"(.*)"$/gm);
-//         default:
-//             return new RegExp(/.*/gm);
-//     }
-//     /* eslint-enable no-useless-escape */
+    const markdownSection = /^#/gm;
+    const sectionResult = markdownSection.exec(link);
+    if (sectionResult !== null) return true;
+
+    return false;
+}
+
+
+
+function GetRootPath(targetPath: string, filePath: string): string {
+    // Source goes from root -> document
+    // Target goes from document -> file
+    const targetPattern = /^(.+\/)/gm;
+    const rootToTarget = Array.from(targetPath.matchAll(targetPattern))[0][1];
+
+    // If prefixed with './' remove it.
+    const filePattern = /^(.\/)*(.*)$/gm;
+    const TargetToFile = Array.from(filePath.matchAll(filePattern))[0][2];
+
+    return `${rootToTarget}${TargetToFile}`;
+}
+
+// function IsValidRelativePath(path: string): boolean {
+//     const relative = /^\.\//gm;
+//     return relative.exec(path) !== null;
 // }
-
-function GetRootPath(fromRootPath: string, relativePath: string): string {
-    /* eslint-disable no-useless-escape */
-    const relPattern = /^\.\/(.*)$/gm;
-    const firstPartPattern = /^(.+)\//gm;
-    /* eslint-enable no-useless-escape */
-    const result = relPattern.exec(relativePath);
-    if (result === null) return '';
-
-    const result2 = firstPartPattern.exec(fromRootPath);
-    if (result2 === null) return '';
-
-    const absolutePath = `${result2[1]}/${result[1]}`;
-
-    return absolutePath;
-}
-
-function IsValidRelativePath(path: string): boolean {
-    const relative = /^\.\//gm;
-    return relative.exec(path) !== null;
-}
 
 

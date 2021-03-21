@@ -12,3 +12,11 @@ export interface ITargetData {
     Details: FileDetails;
     ParentFile: ITarget;
 }
+
+export interface IIssue {
+    Path: string;
+}
+export interface ITargetIssue extends IIssue {
+    OriginalMatch: string;
+    Target: string;
+}

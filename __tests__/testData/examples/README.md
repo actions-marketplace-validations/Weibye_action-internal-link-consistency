@@ -56,7 +56,7 @@ git checkout v0.4.0
 
 Example | Main | Description
 --- | --- | ---
-`hello_world` | [`hello_world.rs`](hello_world.rs) | Runs a minimal example that outputs "hello world"
+`hello_world` | [`hello_world.rs`](./hello_world.rs) | Runs a minimal example that outputs "hello world"
 
 # Cross-Platform Examples
 

@@ -9,6 +9,7 @@ import { FileDetails } from './FileDetails';
 import { GetSourceData } from './SourceData';
 import { GetTargetData } from './TargetData';
 import { ITargetData } from './Interfaces';
+import { CrossReferencer } from './CrossReferencer';
 
 async function run(): Promise<void> {
     try {
@@ -36,42 +37,19 @@ async function run(): Promise<void> {
             const data = GetTargetData(target, config);
             console.log(`Found ${data.length} entries in ${target.Path}`);
             
-            targetData.concat(data);
+            targetData = targetData.concat(data);
         }
-        // for (const data of targetData) {
-        //     console.log(data);
-        // }
-        // // Get examples listed in the Cargo.toml
-        // console.log('======= CARGO =======');
-        // const cargoExamples: FileData[] = checkCargo ? GetExamplesFromCargo(targetsPaths[0], filesToExclude, foldersToExclude) : [];
-        // if (cargoExamples.length > 0) {
-        //     console.log(`Found ${cargoExamples.length} examples in ${pathToCargo}`);
-        //     // for (const example of cargoExamples) {
-        //     //     console.log(example);
-        //     // }
-        // } else {
-        //     if (checkCargo) core.setFailed('Found no examples in Cargo.toml');
-        // }
 
-        // // Get examples listed in the README
-        // console.log('======= README =======');
-        // const readmeExamples: FileData[] = checkReadme ? GetExamplesFromReadme(targetsPaths[1], filesToExclude, foldersToExclude) : [];
-        // if (readmeExamples.length > 0) {
-        //     console.log(`Found ${readmeExamples.length} examples in ${pathToReadme}`);
-        //     // for (const example of readmeExamples) {
-        //     //     console.log(example);
-        //     // }
-        // } else {
-        //     if (checkReadme) core.setFailed('Found no examples in README');
-        // }
-
-        // console.log("======= Cross referencing issues =======");
+        console.log("======= Cross referencing issues =======");
+        const issues = new CrossReferencer(sourceData, targetData).Issues;
         // const issues = CrossReference(diskExamples, cargoExamples, readmeExamples);
-        // if (issues.length > 0) {
-        //     for (const issue of issues) {
-        //         console.log(issue);
-        //     }
-        // }
+
+        issues.diskIssues.forEach(issue => {
+            console.log(`File on disk not in Target: ${issue.Path}`);
+        });
+        issues.targetIssues.forEach(issue => {
+            console.log(`Link in target not found on disk: \nExpected file: ${issue.Path}\nMatch in target: ${issue.OriginalMatch}\nTarget: ${issue.Target}`);
+        });
     } catch (error) {
         core.setFailed(error.message);
     }
