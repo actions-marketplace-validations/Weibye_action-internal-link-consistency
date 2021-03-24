@@ -89,6 +89,10 @@ serde = {version = "1", features = ["derive"]}
 name = "hello_world"
 path = "examples/hello_world.rs"
 
+[[example]]
+name = "only_listed_in_cargo"
+path = "examples/only_listed_in_cargo"
+
 # 2D Rendering
 [[example]]
 name = "contributors"
@@ -343,10 +347,6 @@ path = "examples/reflection/trait_reflection.rs"
 [[example]]
 name = "scene"
 path = "examples/scene/scene.rs"
-
-[[example]]
-name = "only_found_in_cargo"
-path = "only_found_in_cargo.rs"
 
 # Shaders
 [[example]]
