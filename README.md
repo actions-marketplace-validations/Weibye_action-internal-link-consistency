@@ -11,7 +11,6 @@ It's main purpose is to ensure all the target documents has valid links to all t
 The primary user for this action at this moment is Bevy Engine, where it is used to check if all the examples are in fact listed in the Cargo and Readme documents. This to prevent people from adding new examples but forgetting to list them in the other sources, or removing examples from documents but forgetting to remove them from the source code.
 
 TODO:
-    - NOTFOUNDINANY issue is basically just notfoundinall, simply add all the targets to the missing list
     - Links found in targets should respect ignore files and directories
     - Links found in targets should capture which line they are on to make output more clear
     - Targets should not capture links that are commented out
@@ -25,11 +24,22 @@ TODO:
 
 ### Target Style
 #### Markdown
-```[`readme_relative_path_to_file.rs`](./readme/relative/path/to/file.rs)```
+```[`readme_relative_path_to_file.rs`](./relative/path/to/file.rs)```
 #### TOML Path Value
-`path = "root/relative/path/to/example"`
+`path = "relative/path/to/file.rs"`
 
 ### File Ignore
 
+This setting make sure any file listed here is ignored from consideration and cross check. 
+
+This needs to be an array of root-relative paths to files.
+
+
 ### Folder Ignore
+This setting make sure any files or folders (recursively) are ignored from consideration and cross check.
+This needs to be root-relative paths to folders.
+### Whitelist FileType
+
+Empty means it scans for all filetypes on disk. 
+
     
