@@ -5,7 +5,7 @@ import { ReadFileFromPath } from './IoOperations';
 import { LinkStyle } from './LinkStyle';
 
 export function GetTargetData(target: ITarget, config: Config): ITargetData[] {
-    console.log(`Getting data from: ${target.Path}`);
+    // console.log(`Getting data from: ${target.Path}`);
     let output: ITargetData[] = [];
 
     // Read the contents of the file

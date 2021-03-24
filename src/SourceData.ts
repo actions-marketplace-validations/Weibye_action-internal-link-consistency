@@ -13,7 +13,7 @@ export function GetSourceData(path: string, config: Config): FileDetails[] {
             if (IncludeFolder(path + element.name, config)) {
                 files = files.concat(GetSourceData(`${path}${element.name}/`, config));
             } else {
-                console.log(`Folder excluded: ${path}${element.name}`);
+                // console.log(`Folder excluded: ${path}${element.name}`);
             }
         } else {
             const fileDetails = new FileDetails(path + element.name);
