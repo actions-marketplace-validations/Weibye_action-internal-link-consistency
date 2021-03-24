@@ -6,19 +6,16 @@ export class CrossReferencer {
     // File should be present in all targets, or there should be created an issue of the appropriate type:
 
     // Issue types:
-    // - Not found in any targets
-    public NotInAnyTarget: IIssueNotInAny[];
-    // - Only found in some targets: Missing target: list
-    public NotInAllTargets: IIssueNotInAll[];
+    // - Only found in no or some targets: Missing target: list
+    public MissingFromTargets: IIssueNotInAll[];
     // - Found in target (target(s)) but not on disk
-    public NotInSource: IIssueNotInSource[];
+    public MissingFromSource: IIssueNotInSource[];
 
     public HasIssues: boolean;
     
     public constructor(sourceData: FileDetails[], targetData: ITargetOutput[])  {
-        this.NotInAnyTarget = [];
-        this.NotInAllTargets = [];
-        this.NotInSource = [];
+        this.MissingFromTargets = [];
+        this.MissingFromSource = [];
 
         // const clonedSource = [...sourceData];
         const clonedTarget = [...targetData];
@@ -46,22 +43,20 @@ export class CrossReferencer {
                 // Do nothing, it is present in all targets
             } else if (matchesCount === 0) {
                 // not present in any targets
-                this.NotInAnyTarget.push({ Path: source.SourcePath });
-                // console.log(`File not present in any targets: ${source.SourcePath}`);
+                this.MissingFromTargets.push({ Path: source.SourcePath, MissingTargets: targetData.map(e => e.Target) });
             } else {
                 // File present in some, but not all targets
-                // console.log(`File ${source.SourcePath} is missing from ${missingFromTarget}`);
-                this.NotInAllTargets.push({ Path: source.SourcePath, MissingTargets: missingFromTarget });
+                this.MissingFromTargets.push({ Path: source.SourcePath, MissingTargets: missingFromTarget });
             }
         }
 
         clonedTarget.forEach(target => {
             target.Data.forEach(data => {
-                this.NotInSource.push({ Path: data.Details.SourcePath, InTarget: data.ParentFile.Path });
+                this.MissingFromSource.push({ Path: data.Details.SourcePath, InTarget: data.ParentFile.Path });
                 // console.log(`File in target not present in source: ${data.Details.SourcePath}`);
             });
         });
 
-        this.HasIssues = this.NotInAllTargets.length + this.NotInAnyTarget.length + this.NotInSource.length > 0;
+        this.HasIssues = this.MissingFromTargets.length + this.MissingFromSource.length > 0;
     }
 }
