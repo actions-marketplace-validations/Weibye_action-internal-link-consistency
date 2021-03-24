@@ -2,7 +2,7 @@ import { ITarget } from './Interfaces';
 import { LinkStyle } from './LinkStyle';
 
 export const defaultSource = './__tests__/testData/examples/';
-export const defaultFileTypes = ['rs', 'ico'];
+export const defaultFileTypes = ['rs'];
 export const defaultExcludeFiles = ['./__tests__/testData/examples/also_decoy.rs'];
 export const defaultExcludeFolders = ['./__tests__/testData/examples/decoy', './__tests__/testData/examples/excludefolder'];
 
