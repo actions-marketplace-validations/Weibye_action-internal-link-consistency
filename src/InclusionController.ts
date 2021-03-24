@@ -2,7 +2,7 @@ import { Config } from './Config';
 import { FileDetails } from './FileDetails';
 
 export function IncludeFile(fileDetails: FileDetails, config: Config): boolean {
-    return !ExcludeFile(fileDetails.Path, config.ExcludeFiles) && WhitelistedType(fileDetails.Extension, config.WhitelistFileTypes);
+    return !ExcludeFile(fileDetails.SourcePath, config.ExcludeFiles) && WhitelistedType(fileDetails.Extension, config.WhitelistFileTypes);
 }
 
 export function IncludeFolder(path: string, config: Config): boolean {
