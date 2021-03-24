@@ -98,5 +98,13 @@ Thumbs.db
 __tests__/runner/*
 lib/**/*
 
-# Specific for this project
-.vs
+# VSCode 
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Local History for Visual Studio Code
+.history/
