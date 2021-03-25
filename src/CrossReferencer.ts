@@ -1,5 +1,5 @@
-import { FileDetails } from "./FileDetails";
-import { ITargetOutput, IIssueNotInAny, IIssueNotInAll, IIssueNotInSource } from "./Interfaces";
+import { FileDetails } from './FileDetails';
+import { ITargetOutput, IIssueNotInAll, IIssueNotInSource } from './Interfaces';
 
 export class CrossReferencer {
     // Rules:
@@ -12,22 +12,19 @@ export class CrossReferencer {
     public MissingFromSource: IIssueNotInSource[];
 
     public HasIssues: boolean;
-    
-    public constructor(sourceData: FileDetails[], targetData: ITargetOutput[])  {
+
+    public constructor(sourceData: FileDetails[], targetData: ITargetOutput[]) {
         this.MissingFromTargets = [];
         this.MissingFromSource = [];
 
         // const clonedSource = [...sourceData];
         const clonedTarget = [...targetData];
 
-        for (let i = 0; i < sourceData.length; i++) {
-            const source = sourceData[i];
-
+        for (const source of sourceData) {
             let matchesCount = 0;
-            let missingFromTarget: string[] = [];
+            const missingFromTarget: string[] = [];
 
-            for (let j = 0; j < clonedTarget.length; j++) {
-                const clonedTargetData = clonedTarget[j];
+            for (const clonedTargetData of clonedTarget) {
                 const match = clonedTargetData.Data.find(e => e.Details.SourcePath === source.SourcePath);
                 if (match !== undefined) {
                     // Add to the match count
@@ -50,15 +47,15 @@ export class CrossReferencer {
             }
         }
 
-        clonedTarget.forEach(target => {
-            target.Data.forEach(data => {
-                this.MissingFromSource.push({ 
-                    Path: data.Details.SourcePath, 
-                    InTarget: data.ParentFile.Path, 
-                    Line: data.LineNr 
+        for (const target of clonedTarget) {
+            for (const data of target.Data) {
+                this.MissingFromSource.push({
+                    Path: data.Details.SourcePath,
+                    InTarget: data.ParentFile.Path,
+                    Line: data.LineNr
                 });
-            });
-        });
+            }
+        }
 
         this.HasIssues = this.MissingFromTargets.length + this.MissingFromSource.length > 0;
     }

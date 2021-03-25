@@ -17,7 +17,7 @@ function WhitelistedType(extension: string, types: string[]): boolean {
 
 export function ExcludeFile(filePath: string, excludeFiles: string[], excludeDirs: string[]): boolean {
     const excludeByDir = excludeDirs.some(dir => filePath.includes(dir));
-    const excludeByFile =  excludeFiles.some(e => e === filePath);
+    const excludeByFile = excludeFiles.some(e => e === filePath);
 
     return excludeByDir || excludeByFile;
 }

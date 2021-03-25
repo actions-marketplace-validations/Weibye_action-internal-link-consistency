@@ -22,7 +22,7 @@ export interface ITargetOutput {
 export interface IIssue {
     Path: string;
 }
-export interface IIssueNotInAny extends IIssue { }
+// export interface IIssueNotInAny extends IIssue {}
 export interface IIssueNotInAll extends IIssue {
     MissingTargets: string[];
 }

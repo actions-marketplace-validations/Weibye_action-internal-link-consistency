@@ -6,7 +6,7 @@ import { Setup } from './Setup';
 import { FileDetails } from './FileDetails';
 import { GetSourceData } from './SourceData';
 import { GetTargetData } from './TargetData';
-import { ITargetData, ITargetOutput } from './Interfaces';
+import { ITargetOutput } from './Interfaces';
 import { CrossReferencer } from './CrossReferencer';
 
 async function run(): Promise<void> {
@@ -25,32 +25,31 @@ async function run(): Promise<void> {
         }
 
         console.log('======= Getting target data =======');
-        let targetData: ITargetOutput[] = [];
+        const targetData: ITargetOutput[] = [];
         for (const target of config.Targets) {
-
             const data = GetTargetData(target, config);
             console.log(`Found ${data.length} entries in ${target.Path}`);
             const output: ITargetOutput = { Target: target.Path, Data: data };
             targetData.push(output);
         }
 
-        console.log("======= Cross referencing issues =======");
+        console.log('======= Cross referencing issues =======');
         const crossChecker = new CrossReferencer(sourceData, targetData);
         if (crossChecker.HasIssues) {
             if (crossChecker.MissingFromTargets.length > 0) {
                 console.log(`Following files in source was not found in the following target(s):\n`);
-                crossChecker.MissingFromTargets.forEach(issue => {
+                for (const issue of crossChecker.MissingFromTargets) {
                     console.log(`=>\tFile: ${issue.Path} \n\tMissing from targets: ${issue.MissingTargets}\n`);
-                });
+                }
                 console.log('Please add them to the remaining targets or remove them from disk\n');
             }
             if (crossChecker.MissingFromSource.length > 0) {
                 console.log(`Following links was found in target(s) but could not find corresponding file in source:\n`);
-                crossChecker.MissingFromSource.forEach(issue => {
+                for (const issue of crossChecker.MissingFromSource) {
                     console.log(`=>\tFile: ${issue.Path}\n\tIn target: ${issue.InTarget} : ${issue.Line}\n`);
-                });
+                }
                 console.log('Please remove them from the target or make sure the link points to the correct file.');
-                console.log('Note: This often might indicate a typo in the link.\n')
+                console.log('Note: This often might indicate a typo in the link.\n');
             }
             core.setFailed('Cross referencing found issues, see output log to fix them');
         }

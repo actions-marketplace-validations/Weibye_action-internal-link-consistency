@@ -4,10 +4,11 @@ import { ExcludeFile } from './InclusionController';
 import { ITarget, ITargetData } from './Interfaces';
 import { ReadFileFromPath } from './IoOperations';
 import { LinkStyle } from './LinkStyle';
+// import { RegExpMatchArray } from 'RegExp'
 
 export function GetTargetData(target: ITarget, config: Config): ITargetData[] {
     // console.log(`Getting data from: ${target.Path}`);
-    let output: ITargetData[] = [];
+    const output: ITargetData[] = [];
 
     // Read the contents of the file
     const content = ReadFileFromPath(target.Path);
@@ -16,11 +17,11 @@ export function GetTargetData(target: ITarget, config: Config): ITargetData[] {
     let pattern: RegExp;
     let matches: IterableIterator<RegExpMatchArray>;
 
-    const preProcessor: { Orig: string, Link: string, Target: ITarget, Line: number }[] = []
+    const preProcessor: { Orig: string; Link: string; Target: ITarget; Line: number }[] = [];
 
     switch (target.Style) {
         case LinkStyle.Markdown:
-            pattern = /^(?!<!--).*\[([^\[]+)\]\(([^\)]+)\)/gm;
+            pattern = /^(?!<!--).*\[([^[]+)\]\(([^)]+)\)/gm;
             matches = content.matchAll(pattern);
             for (const match of matches) {
                 if (match.index === undefined) {
@@ -63,13 +64,11 @@ export function GetTargetData(target: ITarget, config: Config): ITargetData[] {
     return output;
 }
 
-
-function ExcludeLink(link: string) : boolean {
+function ExcludeLink(link: string): boolean {
     // Exclude comments
     const tomlComment = /^#/gm;
     const tomlRes = tomlComment.exec(link);
     if (tomlRes !== null) return true;
-
 
     // Exclude external links
     const webLinks = /^https*:\/\//gm;
@@ -101,5 +100,3 @@ function GetRootPath(targetPath: string, filePath: string): string {
 //     const relative = /^\.\//gm;
 //     return relative.exec(path) !== null;
 // }
-
-
