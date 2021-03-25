@@ -11,9 +11,7 @@ It's main purpose is to ensure all the target documents has valid links to all t
 The primary user for this action at this moment is Bevy Engine, where it is used to check if all the examples are in fact listed in the Cargo and Readme documents. This to prevent people from adding new examples but forgetting to list them in the other sources, or removing examples from documents but forgetting to remove them from the source code.
 
 TODO:
-    - Links found in targets should respect ignore files and directories
-    - Links found in targets should capture which line they are on to make output more clear
-    - Targets should not capture links that are commented out
+    - Update action.yml
     - Write tests for the system
 ## Usage
 
