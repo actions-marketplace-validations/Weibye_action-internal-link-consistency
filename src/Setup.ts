@@ -10,7 +10,7 @@ export class Setup {
     public Config: Config;
 
     public constructor() {
-        console.log('======= Retrieve inputs =======');
+        // console.log('======= Retrieve inputs =======');
         const source = ParseInput('source') ?? defaultSource;
         const whitelistedExtensions = ParseInputArray('file-types') ?? defaultFileTypes;
         const excludeFolders = ParseInputArray('exclude-folders') ?? defaultExcludeFolders;
@@ -18,7 +18,7 @@ export class Setup {
 
         const targets: ITarget[] = ParseTargets('targets') ?? defaultTargets;
 
-        console.log('======= Config checks =======');
+        // console.log('======= Config checks =======');
         if (source === null || source === undefined) {
             core.setFailed(`Config error: Source directory not defined`);
             process.exit(1);
