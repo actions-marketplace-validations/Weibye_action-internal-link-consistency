@@ -11,6 +11,7 @@ export interface ITargetData {
     // MatchIndex: number;
     Details: FileDetails;
     ParentFile: ITarget;
+    LineNr: number;
 }
 
 export interface ITargetOutput {
@@ -27,6 +28,7 @@ export interface IIssueNotInAll extends IIssue {
 }
 export interface IIssueNotInSource extends IIssue {
     InTarget: string;
+    Line: number;
 }
 export interface ITargetIssue extends IIssue {
     OriginalMatch: string;

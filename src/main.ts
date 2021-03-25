@@ -47,7 +47,7 @@ async function run(): Promise<void> {
             if (crossChecker.MissingFromSource.length > 0) {
                 console.log(`Following links was found in target(s) but could not find corresponding file in source:\n`);
                 crossChecker.MissingFromSource.forEach(issue => {
-                    console.log(`=>\tFile: ${issue.Path} \n\tListed in target: ${issue.InTarget}\n`);
+                    console.log(`=>\tFile: ${issue.Path}\n\tIn target: ${issue.InTarget} : ${issue.Line}\n`);
                 });
                 console.log('Please remove them from the target or make sure the link points to the correct file.');
                 console.log('Note: This often might indicate a typo in the link.\n')

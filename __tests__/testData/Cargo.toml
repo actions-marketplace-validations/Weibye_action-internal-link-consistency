@@ -93,6 +93,8 @@ path = "examples/hello_world.rs"
 name = "only_listed_in_cargo"
 path = "examples/only_listed_in_cargo"
 
+# path = "this_is_commented_out"
+
 # 2D Rendering
 [[example]]
 name = "contributors"

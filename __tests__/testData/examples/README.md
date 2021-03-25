@@ -58,6 +58,7 @@ Example | Main | Description
 --- | --- | ---
 `hello_world` | [`hello_world.rs`](./hello_world.rs) | Runs a minimal example that outputs "hello world"
 `only_listed_in_readme` | [`only_listed_in_readme.rs`](./only_listed_in_readme.rs) | This file is only listed in the README
+<!-- `this_is_commented_out` | [`this_is_commented_out.rs`](./this_is_commented_out.rs) | This file is only listed in the README -->
 
 # Cross-Platform Examples
 

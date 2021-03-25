@@ -1,5 +1,6 @@
 import { Config } from './Config';
 import { FileDetails } from './FileDetails';
+import { ExcludeFile } from './InclusionController';
 import { ITarget, ITargetData } from './Interfaces';
 import { ReadFileFromPath } from './IoOperations';
 import { LinkStyle } from './LinkStyle';
@@ -15,22 +16,30 @@ export function GetTargetData(target: ITarget, config: Config): ITargetData[] {
     let pattern: RegExp;
     let matches: IterableIterator<RegExpMatchArray>;
 
-    const preProcessor: { Orig: string, Link: string, Target: ITarget }[] = []
+    const preProcessor: { Orig: string, Link: string, Target: ITarget, Line: number }[] = []
 
     switch (target.Style) {
         case LinkStyle.Markdown:
-            pattern = /\[([^\[]+)\]\(([^\)]+)\)/gm;
+            pattern = /^(?!<!--).*\[([^\[]+)\]\(([^\)]+)\)/gm;
             matches = content.matchAll(pattern);
             for (const match of matches) {
-                preProcessor.push({ Orig: match[0], Link: match[2], Target: target });
+                if (match.index === undefined) {
+                    console.warn('Could not index of match. Something is wrong somewhere');
+                } else {
+                    preProcessor.push({ Orig: match[0], Link: match[2], Target: target, Line: GetLineNr(content, match.index) });
+                }
             }
             break;
 
         case LinkStyle.TOML_Path_Value:
-            pattern = /^path\s=\s"(.*)"$/gm;
+            pattern = /^(?!#).*path\s=\s"(.*)"$/gm;
             matches = content.matchAll(pattern);
             for (const match of matches) {
-                preProcessor.push({ Orig: match[0], Link: match[1], Target: target });
+                if (match.index === undefined) {
+                    console.warn('Could not index of match. Something is wrong somewhere');
+                } else {
+                    preProcessor.push({ Orig: match[0], Link: match[1], Target: target, Line: GetLineNr(content, match.index) });
+                }
             }
             break;
         default:
@@ -40,31 +49,40 @@ export function GetTargetData(target: ITarget, config: Config): ITargetData[] {
     for (const data of preProcessor) {
         if (!ExcludeLink(data.Link)) {
             const rootPath = GetRootPath(data.Target.Path, data.Link);
-            output.push({
-                Details: new FileDetails(rootPath),
-                RelativePath: data.Link,
-                OriginalMatch: data.Orig,
-                ParentFile: data.Target
-            });
+            if (!ExcludeFile(rootPath, config.ExcludeFiles, config.ExcludeFolders)) {
+                output.push({
+                    Details: new FileDetails(rootPath),
+                    RelativePath: data.Link,
+                    OriginalMatch: data.Orig,
+                    ParentFile: data.Target,
+                    LineNr: data.Line
+                });
+            }
         }
     }
     return output;
 }
 
+
 function ExcludeLink(link: string) : boolean {
-    // external links
+    // Exclude comments
+    const tomlComment = /^#/gm;
+    const tomlRes = tomlComment.exec(link);
+    if (tomlRes !== null) return true;
+
+
+    // Exclude external links
     const webLinks = /^https*:\/\//gm;
     const webResult = webLinks.exec(link);
     if (webResult !== null) return true;
 
-    const markdownSection = /^#/gm;
-    const sectionResult = markdownSection.exec(link);
-    if (sectionResult !== null) return true;
-
     return false;
 }
 
-
+function GetLineNr(content: string, charIndex: number): number {
+    const subString = content.substring(0, charIndex);
+    return subString.split('\n').length;
+}
 
 function GetRootPath(targetPath: string, filePath: string): string {
     // Source goes from root -> document

@@ -52,8 +52,11 @@ export class CrossReferencer {
 
         clonedTarget.forEach(target => {
             target.Data.forEach(data => {
-                this.MissingFromSource.push({ Path: data.Details.SourcePath, InTarget: data.ParentFile.Path });
-                // console.log(`File in target not present in source: ${data.Details.SourcePath}`);
+                this.MissingFromSource.push({ 
+                    Path: data.Details.SourcePath, 
+                    InTarget: data.ParentFile.Path, 
+                    Line: data.LineNr 
+                });
             });
         });
 
