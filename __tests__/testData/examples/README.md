@@ -57,6 +57,8 @@ git checkout v0.4.0
 Example | Main | Description
 --- | --- | ---
 `hello_world` | [`hello_world.rs`](./hello_world.rs) | Runs a minimal example that outputs "hello world"
+`only_listed_in_readme` | [`only_listed_in_readme.rs`](./only_listed_in_readme.rs) | This file is only listed in the README
+<!-- `this_is_commented_out` | [`this_is_commented_out.rs`](./this_is_commented_out.rs) | This file is only listed in the README -->
 
 # Cross-Platform Examples
 
@@ -64,7 +66,7 @@ Example | Main | Description
 
 Example | Main | Description
 --- | --- | ---
-`contributors` | [`2d/contributors.rs`](./2d/contributors.rs) | Displays each contributor as a bouncy bevy-ball!
+`contributors` | [`2d/contributors.rs`](2d/contributors.rs) | Displays each contributor as a bouncy bevy-ball!
 `sprite` | [`2d/sprite.rs`](./2d/sprite.rs) | Renders a sprite
 `sprite_sheet` | [`2d/sprite_sheet.rs`](./2d/sprite_sheet.rs) | Renders an animated sprite
 `text2d` | [`2d/text2d.rs`](./2d/text2d.rs) | Generates text in 2d
@@ -140,11 +142,6 @@ Example | File | Description
 `system_param` | [`ecs/system_param.rs`](./ecs/system_param.rs) | Illustrates creating custom system parameters with `SystemParam`
 `timers` | [`ecs/timers.rs`](./ecs/timers.rs) | Illustrates ticking `Timer` resources inside systems and handling their state
 
-## Decoys
-Example | File | Description
---- | --- | ---
-`example_not_on_disk` | [`test/example_not_on_disk.rs`](./test/example_not_on_disk.rs) | This example is not on disk
-
 ## Games
 
 Example | File | Description
@@ -165,7 +162,6 @@ Example | File | Description
 `mouse_input_events` | [`input/mouse_input_events.rs`](./input/mouse_input_events.rs) | Prints out all mouse events (buttons, movement, etc.)
 `touch_input` | [`input/touch_input.rs`](./input/touch_input.rs) | Displays touch presses, releases, and cancels
 `touch_input_events` | [`input/touch_input_events.rs`](./input/touch_input_input_events.rs) | Prints out all touch inputs
-`missing_description` | [`input/missing_description.rs`](./input/missing_description)
 
 ## Reflection
 

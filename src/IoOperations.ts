@@ -6,5 +6,5 @@ export function IsValidPath(path: string): boolean {
 
 export function ReadFileFromPath(path: string): string {
     const content: string = readFileSync(path, { encoding: 'utf8' });
-    return JSON.stringify(content);
+    return content; // JSON.stringify(content);
 }

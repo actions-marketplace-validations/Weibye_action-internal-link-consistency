@@ -56,7 +56,10 @@ exports.defaultSource = '__tests__/testData/examples/';
 exports.defaultFileTypes = ['rs', 'ico'];
 exports.defaultExcludeFiles = ['__tests__/testData/examples/also_decoy.rs'];
 exports.defaultExcludeFolders = ['__tests__/testData/examples/decoy', '__tests__/testData/examples/excludefolder'];
-exports.defaultTargets = [{ Path: '__tests__/testData/examples/README.md', Style: LinkStyle_1.LinkMarkdown.Markdown }];
+exports.defaultTargets = [
+    { Path: '__tests__/testData/examples/README.md', Style: LinkStyle_1.LinkStyle.Markdown }
+    // { Path: '__tests__/testData/Cargo.toml', Style: LinkStyle.TOML_Path_Value }
+];
 
 
 /***/ }),
@@ -223,7 +226,7 @@ function IsValidPath(path) {
 exports.IsValidPath = IsValidPath;
 function ReadFileFromPath(path) {
     const content = fs_1.readFileSync(path, { encoding: 'utf8' });
-    return JSON.stringify(content);
+    return content; // JSON.stringify(content);
 }
 exports.ReadFileFromPath = ReadFileFromPath;
 
@@ -235,12 +238,12 @@ exports.ReadFileFromPath = ReadFileFromPath;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.LinkMarkdown = void 0;
-var LinkMarkdown;
-(function (LinkMarkdown) {
-    LinkMarkdown[LinkMarkdown["Markdown"] = 0] = "Markdown";
-    LinkMarkdown[LinkMarkdown["TOML_Path_Value"] = 1] = "TOML_Path_Value";
-})(LinkMarkdown = exports.LinkMarkdown || (exports.LinkMarkdown = {}));
+exports.LinkStyle = void 0;
+var LinkStyle;
+(function (LinkStyle) {
+    LinkStyle[LinkStyle["Markdown"] = 0] = "Markdown";
+    LinkStyle[LinkStyle["TOML_Path_Value"] = 1] = "TOML_Path_Value";
+})(LinkStyle = exports.LinkStyle || (exports.LinkStyle = {}));
 
 
 /***/ }),
@@ -279,6 +282,7 @@ const LinkStyle_1 = __webpack_require__(954);
 class Setup {
     constructor() {
         var _a, _b, _c, _d, _e;
+        console.log('======= Retrieve inputs =======');
         const source = (_a = InputParser_1.ParseInput('source')) !== null && _a !== void 0 ? _a : Defaults_1.defaultSource;
         const whitelistedExtensions = (_b = InputParser_1.ParseInputArray('file-types')) !== null && _b !== void 0 ? _b : Defaults_1.defaultFileTypes;
         const excludeFolders = (_c = InputParser_1.ParseInputArray('exclude-folders')) !== null && _c !== void 0 ? _c : Defaults_1.defaultExcludeFolders;
@@ -294,6 +298,7 @@ class Setup {
             core.setFailed(`Source directory not found: ${source}`);
             process.exit(1);
         }
+        // Check valid targets
         if (targets === null || targets === undefined || targets.length < 1) {
             core.setFailed(`Config error: No targets defined`);
             process.exit(1);
@@ -303,7 +308,7 @@ class Setup {
                 core.setFailed(`Target not found: ${target.Path}`);
                 process.exit(1);
             }
-            if (!Object.values(LinkStyle_1.LinkMarkdown).includes(target.Style)) {
+            if (!Object.values(LinkStyle_1.LinkStyle).includes(target.Style)) {
                 core.setFailed(`Invalid Style not found: ${target.Style}`);
                 process.exit(1);
             }
@@ -352,6 +357,68 @@ exports.GetSourceData = GetSourceData;
 
 /***/ }),
 
+/***/ 906:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GetTargetData = void 0;
+const IoOperations_1 = __webpack_require__(222);
+const LinkStyle_1 = __webpack_require__(954);
+function GetTargetData(target, config) {
+    console.log(`Getting data from: ${target.Path}`);
+    // Get relative path
+    // Read the contents of the file
+    const content = IoOperations_1.ReadFileFromPath(target.Path);
+    if (content.length <= 0)
+        return undefined;
+    const pattern = GetPattern(target.Style);
+    const matches = content.matchAll(pattern);
+    for (const match of matches) {
+        if (IsRelativePath(match[2])) {
+            console.log(`${match[2]} | Index: ${match.index} | AbsolutePath: ${GetAbsolutePath(target.Path, match[2])}`);
+        }
+    }
+    // Look for links based off target.Style
+}
+exports.GetTargetData = GetTargetData;
+function GetPattern(style) {
+    /* eslint-disable no-useless-escape */
+    switch (style) {
+        case LinkStyle_1.LinkStyle.Markdown:
+            return /\[([^\[]+)\]\(([^\)]+)\)/gm;
+        case LinkStyle_1.LinkStyle.TOML_Path_Value:
+            return new RegExp(/.*/gm);
+        default:
+            return new RegExp(/.*/gm);
+    }
+    /* eslint-enable no-useless-escape */
+}
+function GetAbsolutePath(fromRootPath, relativePath) {
+    const relPattern = /^\.\/(.*)$/gm;
+    const firstPartPattern = /^(.+)\//gm;
+    const result = relPattern.exec(relativePath);
+    if (result === null)
+        return '';
+    const result2 = firstPartPattern.exec(fromRootPath);
+    if (result2 === null)
+        return '';
+    // const relLink = result[1];
+    const absolutePath = `${result2[1]}/${result[1]}`;
+    console.log(`Absolute path: ${absolutePath}`);
+    // for (const iterator of result) {
+    //     console.log(`Result: ${iterator[1]}`);
+    // }
+    return '';
+}
+function IsRelativePath(path) {
+    const relative = /^\.\//gm;
+    return relative.exec(path) !== null;
+}
+
+
+/***/ }),
+
 /***/ 109:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -392,11 +459,11 @@ const core = __importStar(__webpack_require__(186));
 // import { GetExamplesFromReadme } from './ReadmeExamples';
 const Setup_1 = __webpack_require__(275);
 const SourceData_1 = __webpack_require__(14);
+const TargetData_1 = __webpack_require__(906);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             console.log('======= Starting Job =======');
-            console.log('======= Getting config =======');
             const config = new Setup_1.Setup().Config;
             console.log(`Running job with config: \n${config.ToString()}`);
             // Get examples from directories
@@ -411,8 +478,12 @@ function run() {
             else {
                 core.setFailed('Found no entries in source');
             }
-            // console.log('======= Getting target data =======');
-            // let targetData;
+            console.log('======= Getting target data =======');
+            // let targetData = [];
+            for (const target of config.Targets) {
+                // targetData.concat(
+                TargetData_1.GetTargetData(target, config);
+            }
             // for (const target of targets) {
             // }
             // // Get examples listed in the Cargo.toml

@@ -4,7 +4,8 @@ import { ITarget } from './Interfaces';
 export function ParseInput(inputName: string): string | undefined {
     const input = core.getInput(inputName);
     if (input === undefined || input === '') {
-        console.log(`Config Error: Unable to get config input ${inputName}`); // Using defaults
+        // core.setFailed(`Config Error: Unable to get array input ${inputName}`);
+        // console.log(`Config Error: Unable to get config input ${inputName}`); // Using defaults
         return undefined;
     } else {
         return input;
