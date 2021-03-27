@@ -22,9 +22,9 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ./
         with:
-          source: '__tests__/validData/data/'
+          source: './__tests__/validData/data/'
           file-types: '["test"]'
-          exclude-folders: '["__tests__/validData/ignorefolder"]'
-          exclude-files: '["__tests__/validData/should_be_ignored.test"]'
-          targets: '[ { "Path": "__tests__/validData/ValidToml.toml", "Style": 0 }, { "Path": "__tests__/validData/ValidReadme.md", "Style": 1 }]'
+          exclude-folders: '["./__tests__/validData/ignorefolder"]'
+          exclude-files: '["./__tests__/validData/should_be_ignored.test"]'
+          targets: '[ { "Path": "./__tests__/validData/ValidToml.toml", "Style": 0 }, { "Path": "./__tests__/validData/ValidReadme.md", "Style": 1 }]'
           
