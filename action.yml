@@ -1,4 +1,4 @@
-name: 'example_checker'
+name: 'super_unique_name_no_one_else_have_taken_rfewiojdewniq2jd2in'
 description: 'Action to cross reference examples in source code, README.md and Cargo.toml to ensure they contain the same info.'
 author: 'Andreas Weibye'
 inputs:
