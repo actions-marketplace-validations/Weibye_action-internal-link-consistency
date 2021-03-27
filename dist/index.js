@@ -412,7 +412,7 @@ class Config {
     ToString() {
         let output = '';
         output += `\tSource: ${this.Source}\n`;
-        output += `\tWhitelist: ${this.WhitelistFileTypes}\n`;
+        output += `\tFileTypes: ${this.WhitelistFileTypes}\n`;
         output += `\tExcludeFolders: ${this.ExcludeFolders}\n`;
         output += `\tExcludeFiles: ${this.ExcludeFiles}\n`;
         for (const target of this.Targets) {
@@ -422,14 +422,6 @@ class Config {
     }
 }
 exports.Config = Config;
-// export class Target implements ITarget {
-//     public Path: string;
-//     public Style: LinkStyle;
-//     public constructor(path: string, linkStyle: LinkStyle) {
-//         this.Path = path;
-//         this.Style = linkStyle;
-//     }
-// }
 
 
 /***/ }),
@@ -498,13 +490,13 @@ exports.CrossReferencer = CrossReferencer;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.defaultTargets = exports.defaultExcludeFolders = exports.defaultExcludeFiles = exports.defaultFileTypes = exports.defaultSource = void 0;
 const LinkStyle_1 = __nccwpck_require__(894);
-exports.defaultSource = './__tests__/validData/data/';
-exports.defaultFileTypes = ['test'];
-exports.defaultExcludeFiles = ['./__tests__/validData/data/should_be_ignored.test'];
-exports.defaultExcludeFolders = ['./__tests__/validData/data/ignorefolder'];
+exports.defaultSource = './__tests__/testData/examples/';
+exports.defaultFileTypes = ['rs'];
+exports.defaultExcludeFiles = [];
+exports.defaultExcludeFolders = ['./__tests__/testData/examples/ios'];
 exports.defaultTargets = [
-    { Path: './__tests__/validData/ValidReadme.md', Style: LinkStyle_1.LinkStyle.Markdown },
-    { Path: './__tests__/validData/ValidToml.toml', Style: LinkStyle_1.LinkStyle.TOML_Path_Value }
+    { Path: './__tests__/testData/examples/README.md', Style: LinkStyle_1.LinkStyle.Markdown },
+    { Path: './__tests__/testData/Cargo.toml', Style: LinkStyle_1.LinkStyle.TOML_Path_Value }
 ];
 
 
@@ -738,7 +730,6 @@ var LinkStyle;
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
-// eslint:disable: no-console
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
@@ -768,6 +759,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+// eslint:disable: no-console
 const core = __importStar(__nccwpck_require__(186));
 // const github = require('@actions/github');
 const Setup_1 = __nccwpck_require__(490);
@@ -801,6 +793,7 @@ function run() {
             const crossChecker = new CrossReferencer_1.CrossReferencer(sourceData, targetData);
             if (crossChecker.HasIssues) {
                 const output = new IssueLogger_1.IssueLogger(crossChecker.MissingFromTargets, crossChecker.MissingFromSource);
+                core.setOutput('SourceIssues', output.SourceIssueOutput);
                 output.PrintIssues();
                 core.setFailed('Cross referencing found issues, see output log to fix them');
             }
@@ -852,7 +845,7 @@ class Setup {
         var _a, _b, _c, _d, _e;
         // console.log('======= Retrieve inputs =======');
         const source = (_a = InputParser_1.ParseInput('source')) !== null && _a !== void 0 ? _a : Defaults_1.defaultSource;
-        const whitelistedExtensions = (_b = InputParser_1.ParseInputArray('file-types')) !== null && _b !== void 0 ? _b : Defaults_1.defaultFileTypes;
+        const fileTypes = (_b = InputParser_1.ParseInputArray('file-types')) !== null && _b !== void 0 ? _b : Defaults_1.defaultFileTypes;
         const excludeFolders = (_c = InputParser_1.ParseInputArray('exclude-folders')) !== null && _c !== void 0 ? _c : Defaults_1.defaultExcludeFolders;
         const excludeFiles = (_d = InputParser_1.ParseInputArray('exclude-files')) !== null && _d !== void 0 ? _d : Defaults_1.defaultExcludeFiles;
         const targets = (_e = InputParser_1.ParseTargets('targets')) !== null && _e !== void 0 ? _e : Defaults_1.defaultTargets;
@@ -881,7 +874,7 @@ class Setup {
                 process.exit(1);
             }
         }
-        this.Config = new Config_1.Config(source, whitelistedExtensions, excludeFolders, excludeFiles, targets);
+        this.Config = new Config_1.Config(source, fileTypes, excludeFolders, excludeFiles, targets);
     }
 }
 exports.Setup = Setup;

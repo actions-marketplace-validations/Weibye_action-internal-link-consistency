@@ -37,6 +37,7 @@ async function run(): Promise<void> {
         const crossChecker = new CrossReferencer(sourceData, targetData);
         if (crossChecker.HasIssues) {
             const output = new IssueLogger(crossChecker.MissingFromTargets, crossChecker.MissingFromSource);
+            core.setOutput('SourceIssues', output.SourceIssueOutput);
             output.PrintIssues();
             core.setFailed('Cross referencing found issues, see output log to fix them');
         }

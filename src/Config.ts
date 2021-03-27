@@ -22,7 +22,7 @@ export class Config {
     public ToString(): string {
         let output = '';
         output += `\tSource: ${this.Source}\n`;
-        output += `\tWhitelist: ${this.WhitelistFileTypes}\n`;
+        output += `\tFileTypes: ${this.WhitelistFileTypes}\n`;
         output += `\tExcludeFolders: ${this.ExcludeFolders}\n`;
         output += `\tExcludeFiles: ${this.ExcludeFiles}\n`;
         for (const target of this.Targets) {
@@ -31,13 +31,3 @@ export class Config {
         return output;
     }
 }
-
-// export class Target implements ITarget {
-//     public Path: string;
-//     public Style: LinkStyle;
-
-//     public constructor(path: string, linkStyle: LinkStyle) {
-//         this.Path = path;
-//         this.Style = linkStyle;
-//     }
-// }

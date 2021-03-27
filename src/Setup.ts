@@ -12,7 +12,7 @@ export class Setup {
     public constructor() {
         // console.log('======= Retrieve inputs =======');
         const source = ParseInput('source') ?? defaultSource;
-        const whitelistedExtensions = ParseInputArray('file-types') ?? defaultFileTypes;
+        const fileTypes = ParseInputArray('file-types') ?? defaultFileTypes;
         const excludeFolders = ParseInputArray('exclude-folders') ?? defaultExcludeFolders;
         const excludeFiles = ParseInputArray('exclude-files') ?? defaultExcludeFiles;
 
@@ -46,6 +46,6 @@ export class Setup {
             }
         }
 
-        this.Config = new Config(source, whitelistedExtensions, excludeFolders, excludeFiles, targets);
+        this.Config = new Config(source, fileTypes, excludeFolders, excludeFiles, targets);
     }
 }
