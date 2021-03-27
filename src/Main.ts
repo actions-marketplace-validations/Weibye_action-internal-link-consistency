@@ -1,5 +1,4 @@
 // eslint:disable: no-console
-
 import * as core from '@actions/core';
 // const github = require('@actions/github');
 import { Setup } from './Setup';
@@ -10,7 +9,7 @@ import { ITargetOutput } from './Interfaces';
 import { CrossReferencer } from './CrossReferencer';
 import { IssueLogger } from './IssueLogger';
 
-const run = async (): Promise<void> => {
+async function run(): Promise<void> {
     try {
         console.log('======= Starting Job =======');
 
@@ -44,7 +43,7 @@ const run = async (): Promise<void> => {
     } catch (error) {
         core.setFailed(error.message);
     }
-};
+}
 
 // eslint:enable: no-console
-export default run;
+run();
