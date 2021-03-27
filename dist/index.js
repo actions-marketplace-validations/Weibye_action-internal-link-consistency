@@ -109,13 +109,13 @@ exports.CrossReferencer = CrossReferencer;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.defaultTargets = exports.defaultExcludeFolders = exports.defaultExcludeFiles = exports.defaultFileTypes = exports.defaultSource = void 0;
 const LinkStyle_1 = __webpack_require__(954);
-exports.defaultSource = './__tests__/testData/examples/';
-exports.defaultFileTypes = ['rs'];
-exports.defaultExcludeFiles = ['./__tests__/testData/examples/this_file_should_be_excluded.rs'];
-exports.defaultExcludeFolders = ['./__tests__/testData/examples/excludefolder', './__tests__/testData/examples/ios'];
+exports.defaultSource = './__tests__/validData/data/';
+exports.defaultFileTypes = ['test'];
+exports.defaultExcludeFiles = ['./__tests__/validData/data/should_be_ignored.test'];
+exports.defaultExcludeFolders = ['./__tests__/validData/data/ignorefolder'];
 exports.defaultTargets = [
-    { Path: './__tests__/testData/examples/README.md', Style: LinkStyle_1.LinkStyle.Markdown },
-    { Path: './__tests__/testData/Cargo.toml', Style: LinkStyle_1.LinkStyle.TOML_Path_Value }
+    { Path: './__tests__/validData/ValidReadme.md', Style: LinkStyle_1.LinkStyle.Markdown },
+    { Path: './__tests__/validData/ValidToml.toml', Style: LinkStyle_1.LinkStyle.TOML_Path_Value }
 ];
 
 
