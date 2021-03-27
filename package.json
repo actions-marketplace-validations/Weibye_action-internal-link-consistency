@@ -1,9 +1,9 @@
 {
     "name": "example_checker",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "private": false,
     "description": "Action to cross reference examples in source code, README.md and Cargo.toml to ensure they contain the same info.",
-    "main": "lib/main.js",
+    "main": "lib/Main.js",
     "scripts": {
         "build": "tsc",
         "format": "prettier --write **/*.ts",

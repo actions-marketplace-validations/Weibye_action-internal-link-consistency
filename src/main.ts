@@ -8,6 +8,7 @@ import { GetSourceData } from './SourceData';
 import { GetTargetData } from './TargetData';
 import { ITargetOutput } from './Interfaces';
 import { CrossReferencer } from './CrossReferencer';
+import { IssueLogger } from './IssueLogger';
 
 async function run(): Promise<void> {
     try {
@@ -36,21 +37,8 @@ async function run(): Promise<void> {
         console.log('======= Cross referencing issues =======');
         const crossChecker = new CrossReferencer(sourceData, targetData);
         if (crossChecker.HasIssues) {
-            if (crossChecker.MissingFromTargets.length > 0) {
-                console.log(`Following files in source was not found in the following target(s):\n`);
-                for (const issue of crossChecker.MissingFromTargets) {
-                    console.log(`=>\tFile: ${issue.Path} \n\tMissing from targets: ${issue.MissingTargets}\n`);
-                }
-                console.log('Please add them to the remaining targets or remove them from disk\n');
-            }
-            if (crossChecker.MissingFromSource.length > 0) {
-                console.log(`Following links was found in target(s) but could not find corresponding file in source:\n`);
-                for (const issue of crossChecker.MissingFromSource) {
-                    console.log(`=>\tFile: ${issue.Path}\n\tIn target: ${issue.InTarget} : ${issue.Line}\n`);
-                }
-                console.log('Please remove them from the target or make sure the link points to the correct file.');
-                console.log('Note: This often might indicate a typo in the link.\n');
-            }
+            const output = new IssueLogger(crossChecker.MissingFromTargets, crossChecker.MissingFromSource);
+            output.PrintIssues();
             core.setFailed('Cross referencing found issues, see output log to fix them');
         }
     } catch (error) {

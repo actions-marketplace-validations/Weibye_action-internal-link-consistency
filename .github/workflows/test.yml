@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
-          npm install
+          npm ci
       - run: |
           npm run all
   test: # make sure the action works on a clean machine without building
@@ -22,9 +22,9 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ./
         with:
-          source: '__tests__/testData/examples/'
-          file-types: '["rs", "ico"]'
-          exclude-folders: '["hello/world"]'
-          exclude-files: '["test/file.thing"]'
-          targets: '[ { "Path": "__tests__/testData/Cargo.toml", "Style": 0 }, { "Path": "__tests__/testData/examples/README.md", "Style": 1 }]'
+          source: './__tests__/validData/data/'
+          file-types: '["test"]'
+          exclude-folders: '["./__tests__/validData/data/ignorefolder"]'
+          exclude-files: '["./__tests__/validData/data/should_be_ignored.test"]'
+          targets: '[ { "Path": "./__tests__/validData/ValidToml.toml", "Style": 1 }, { "Path": "./__tests__/validData/ValidReadme.md", "Style": 0 }]'
           

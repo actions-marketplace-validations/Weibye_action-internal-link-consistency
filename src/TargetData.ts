@@ -95,8 +95,3 @@ function GetRootPath(targetPath: string, filePath: string): string {
 
     return `${rootToTarget}${TargetToFile}`;
 }
-
-// function IsValidRelativePath(path: string): boolean {
-//     const relative = /^\.\//gm;
-//     return relative.exec(path) !== null;
-// }
