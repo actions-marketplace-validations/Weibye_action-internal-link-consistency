@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "private": false,
     "description": "Action to cross reference examples in source code, README.md and Cargo.toml to ensure they contain the same info.",
-    "main": "lib/Main.js",
+    "main": "dist/index.js",
     "scripts": {
         "build": "npx tsc",
         "format": "prettier --write **/*.ts",
