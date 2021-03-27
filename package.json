@@ -1,5 +1,5 @@
 {
-    "name": "example_checker",
+    "name": "action-internal-link-consistency",
     "version": "1.0.0",
     "private": false,
     "description": "Action to cross reference examples in source code, README.md and Cargo.toml to ensure they contain the same info.",

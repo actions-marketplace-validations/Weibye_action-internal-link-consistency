@@ -22,6 +22,9 @@ inputs:
     required: true
     description: 'Some description'
     default: '{ "targets": ["examples/README.md"] }'
+branding:
+  icon: 'check-circle'
+  color: 'orange'
 runs:
   using: 'node12'
   main: 'dist/index.js'
