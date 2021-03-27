@@ -775,43 +775,41 @@ const SourceData_1 = __webpack_require__(989);
 const TargetData_1 = __webpack_require__(430);
 const CrossReferencer_1 = __webpack_require__(252);
 const IssueLogger_1 = __webpack_require__(686);
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            console.log('======= Starting Job =======');
-            const config = new Setup_1.Setup().Config;
-            console.log(`Running job with config: \n${config.ToString()}`);
-            console.log('======= Getting source data =======');
-            const sourceData = SourceData_1.GetSourceData(config.Source, config);
-            if (sourceData.length > 0) {
-                console.log(`Found ${sourceData.length} entries in ${config.Source}`);
-            }
-            else {
-                core.setFailed('Found no entries in source');
-            }
-            console.log('======= Getting target data =======');
-            const targetData = [];
-            for (const target of config.Targets) {
-                const data = TargetData_1.GetTargetData(target, config);
-                console.log(`Found ${data.length} entries in ${target.Path}`);
-                const output = { Target: target.Path, Data: data };
-                targetData.push(output);
-            }
-            console.log('======= Cross referencing issues =======');
-            const crossChecker = new CrossReferencer_1.CrossReferencer(sourceData, targetData);
-            if (crossChecker.HasIssues) {
-                const output = new IssueLogger_1.IssueLogger(crossChecker.MissingFromTargets, crossChecker.MissingFromSource);
-                output.PrintIssues();
-                core.setFailed('Cross referencing found issues, see output log to fix them');
-            }
+const run = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log('======= Starting Job =======');
+        const config = new Setup_1.Setup().Config;
+        console.log(`Running job with config: \n${config.ToString()}`);
+        console.log('======= Getting source data =======');
+        const sourceData = SourceData_1.GetSourceData(config.Source, config);
+        if (sourceData.length > 0) {
+            console.log(`Found ${sourceData.length} entries in ${config.Source}`);
         }
-        catch (error) {
-            core.setFailed(error.message);
+        else {
+            core.setFailed('Found no entries in source');
         }
-    });
-}
+        console.log('======= Getting target data =======');
+        const targetData = [];
+        for (const target of config.Targets) {
+            const data = TargetData_1.GetTargetData(target, config);
+            console.log(`Found ${data.length} entries in ${target.Path}`);
+            const output = { Target: target.Path, Data: data };
+            targetData.push(output);
+        }
+        console.log('======= Cross referencing issues =======');
+        const crossChecker = new CrossReferencer_1.CrossReferencer(sourceData, targetData);
+        if (crossChecker.HasIssues) {
+            const output = new IssueLogger_1.IssueLogger(crossChecker.MissingFromTargets, crossChecker.MissingFromSource);
+            output.PrintIssues();
+            core.setFailed('Cross referencing found issues, see output log to fix them');
+        }
+    }
+    catch (error) {
+        core.setFailed(error.message);
+    }
+});
 // eslint:enable: no-console
-run();
+exports.default = run;
 
 
 /***/ }),
