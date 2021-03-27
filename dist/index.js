@@ -4,7 +4,7 @@ require('./sourcemap-register.js');module.exports =
 /******/ 	var __webpack_modules__ = ({
 
 /***/ 351:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
 var __importStar = (this && this.__importStar) || function (mod) {
@@ -15,8 +15,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const os = __importStar(__webpack_require__(87));
-const utils_1 = __webpack_require__(278);
+const os = __importStar(__nccwpck_require__(87));
+const utils_1 = __nccwpck_require__(278);
 /**
  * Commands
  *
@@ -89,7 +89,7 @@ function escapeProperty(s) {
 /***/ }),
 
 /***/ 186:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -109,11 +109,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const command_1 = __webpack_require__(351);
-const file_command_1 = __webpack_require__(717);
-const utils_1 = __webpack_require__(278);
-const os = __importStar(__webpack_require__(87));
-const path = __importStar(__webpack_require__(622));
+const command_1 = __nccwpck_require__(351);
+const file_command_1 = __nccwpck_require__(717);
+const utils_1 = __nccwpck_require__(278);
+const os = __importStar(__nccwpck_require__(87));
+const path = __importStar(__nccwpck_require__(622));
 /**
  * The code to exit an action
  */
@@ -333,7 +333,7 @@ exports.getState = getState;
 /***/ }),
 
 /***/ 717:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
 // For internal use, subject to change.
@@ -347,9 +347,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const fs = __importStar(__webpack_require__(747));
-const os = __importStar(__webpack_require__(87));
-const utils_1 = __webpack_require__(278);
+const fs = __importStar(__nccwpck_require__(747));
+const os = __importStar(__nccwpck_require__(87));
+const utils_1 = __nccwpck_require__(278);
 function issueCommand(command, message) {
     const filePath = process.env[`GITHUB_${command}`];
     if (!filePath) {
@@ -492,12 +492,12 @@ exports.CrossReferencer = CrossReferencer;
 /***/ }),
 
 /***/ 605:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.defaultTargets = exports.defaultExcludeFolders = exports.defaultExcludeFiles = exports.defaultFileTypes = exports.defaultSource = void 0;
-const LinkStyle_1 = __webpack_require__(894);
+const LinkStyle_1 = __nccwpck_require__(894);
 exports.defaultSource = './__tests__/validData/data/';
 exports.defaultFileTypes = ['test'];
 exports.defaultExcludeFiles = ['./__tests__/validData/data/should_be_ignored.test'];
@@ -592,7 +592,7 @@ function ExcludeDirectory(dirPath, excludeDirs) {
 /***/ }),
 
 /***/ 69:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -616,7 +616,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ParseTargets = exports.ParseInputArray = exports.ParseInput = void 0;
-const core = __importStar(__webpack_require__(186));
+const core = __importStar(__nccwpck_require__(186));
 function ParseInput(inputName) {
     const input = core.getInput(inputName);
     if (input === undefined || input === '') {
@@ -664,12 +664,12 @@ exports.ParseTargets = ParseTargets;
 /***/ }),
 
 /***/ 535:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ReadFileFromPath = exports.IsValidPath = void 0;
-const fs_1 = __webpack_require__(747);
+const fs_1 = __nccwpck_require__(747);
 function IsValidPath(path) {
     return fs_1.existsSync(path);
 }
@@ -735,7 +735,7 @@ var LinkStyle;
 /***/ }),
 
 /***/ 979:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
 // eslint:disable: no-console
@@ -768,13 +768,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core = __importStar(__webpack_require__(186));
+const core = __importStar(__nccwpck_require__(186));
 // const github = require('@actions/github');
-const Setup_1 = __webpack_require__(490);
-const SourceData_1 = __webpack_require__(989);
-const TargetData_1 = __webpack_require__(430);
-const CrossReferencer_1 = __webpack_require__(252);
-const IssueLogger_1 = __webpack_require__(686);
+const Setup_1 = __nccwpck_require__(490);
+const SourceData_1 = __nccwpck_require__(989);
+const TargetData_1 = __nccwpck_require__(430);
+const CrossReferencer_1 = __nccwpck_require__(252);
+const IssueLogger_1 = __nccwpck_require__(686);
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log('======= Starting Job =======');
@@ -815,7 +815,7 @@ exports.default = run;
 /***/ }),
 
 /***/ 490:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -839,12 +839,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Setup = void 0;
-const core = __importStar(__webpack_require__(186));
-const Config_1 = __webpack_require__(996);
-const Defaults_1 = __webpack_require__(605);
-const InputParser_1 = __webpack_require__(69);
-const IoOperations_1 = __webpack_require__(535);
-const LinkStyle_1 = __webpack_require__(894);
+const core = __importStar(__nccwpck_require__(186));
+const Config_1 = __nccwpck_require__(996);
+const Defaults_1 = __nccwpck_require__(605);
+const InputParser_1 = __nccwpck_require__(69);
+const IoOperations_1 = __nccwpck_require__(535);
+const LinkStyle_1 = __nccwpck_require__(894);
 class Setup {
     constructor() {
         var _a, _b, _c, _d, _e;
@@ -888,14 +888,14 @@ exports.Setup = Setup;
 /***/ }),
 
 /***/ 989:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GetSourceData = void 0;
-const fs_1 = __webpack_require__(747);
-const FileDetails_1 = __webpack_require__(8);
-const InclusionController_1 = __webpack_require__(758);
+const fs_1 = __nccwpck_require__(747);
+const FileDetails_1 = __nccwpck_require__(8);
+const InclusionController_1 = __nccwpck_require__(758);
 function GetSourceData(path, config) {
     let files = [];
     const dirs = fs_1.readdirSync(path, { withFileTypes: true });
@@ -924,15 +924,15 @@ exports.GetSourceData = GetSourceData;
 /***/ }),
 
 /***/ 430:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GetTargetData = void 0;
-const FileDetails_1 = __webpack_require__(8);
-const InclusionController_1 = __webpack_require__(758);
-const IoOperations_1 = __webpack_require__(535);
-const LinkStyle_1 = __webpack_require__(894);
+const FileDetails_1 = __nccwpck_require__(8);
+const InclusionController_1 = __nccwpck_require__(758);
+const IoOperations_1 = __nccwpck_require__(535);
+const LinkStyle_1 = __nccwpck_require__(894);
 // import { RegExpMatchArray } from 'RegExp'
 function GetTargetData(target, config) {
     // console.log(`Getting data from: ${target.Path}`);
@@ -1047,7 +1047,7 @@ module.exports = require("path");;
 /******/ 	var __webpack_module_cache__ = {};
 /******/ 	
 /******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
+/******/ 	function __nccwpck_require__(moduleId) {
 /******/ 		// Check if module is in cache
 /******/ 		if(__webpack_module_cache__[moduleId]) {
 /******/ 			return __webpack_module_cache__[moduleId].exports;
@@ -1062,7 +1062,7 @@ module.exports = require("path");;
 /******/ 		// Execute the module function
 /******/ 		var threw = true;
 /******/ 		try {
-/******/ 			__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 			__webpack_modules__[moduleId].call(module.exports, module, module.exports, __nccwpck_require__);
 /******/ 			threw = false;
 /******/ 		} finally {
 /******/ 			if(threw) delete __webpack_module_cache__[moduleId];
@@ -1075,11 +1075,11 @@ module.exports = require("path");;
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
-/******/ 	__webpack_require__.ab = __dirname + "/";/************************************************************************/
+/******/ 	__nccwpck_require__.ab = __dirname + "/";/************************************************************************/
 /******/ 	// module exports must be returned from runtime so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(979);
+/******/ 	return __nccwpck_require__(979);
 /******/ })()
 ;
 //# sourceMappingURL=index.js.map
