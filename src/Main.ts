@@ -10,7 +10,7 @@ import { ITargetOutput } from './Interfaces';
 import { CrossReferencer } from './CrossReferencer';
 import { IssueLogger } from './IssueLogger';
 
-async function run(): Promise<void> {
+const run = async (): Promise<void> => {
     try {
         console.log('======= Starting Job =======');
 
@@ -44,7 +44,7 @@ async function run(): Promise<void> {
     } catch (error) {
         core.setFailed(error.message);
     }
-}
+};
 
 // eslint:enable: no-console
-run();
+export default run;

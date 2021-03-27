@@ -5,13 +5,13 @@
     "description": "Action to cross reference examples in source code, README.md and Cargo.toml to ensure they contain the same info.",
     "main": "lib/Main.js",
     "scripts": {
-        "build": "tsc",
+        "build": "npx tsc",
         "format": "prettier --write **/*.ts",
         "format-check": "prettier --check **/*.ts",
         "lint": "eslint src/**/*.ts",
-        "package": "ncc build --source-map --license licenses.txt",
+        "package": "npx ncc build src/Main.ts --source-map --license licenses.txt",
         "test": "jest",
-        "all": "npm run build && npm run format && npm run lint && npm run package",
+        "all": "npm run format && npm run lint && npm run package",
         "dev": "nodemon --watch src -e ts,ejs --exec \"npm run build && npm run start\"",
         "start": "node ."
     },
