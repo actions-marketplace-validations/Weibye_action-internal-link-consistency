@@ -3,31 +3,48 @@ import { IIssueNotInAll, IIssueNotInSource } from './Interfaces';
 export class IssueLogger {
     public TargetIssueOutput: string;
     public SourceIssueOutput: string;
+    public IssueCount: number;
+    private issueIter = 1;
 
     public constructor(sourceIssues: IIssueNotInAll[], targetIssues: IIssueNotInSource[]) {
+        this.IssueCount = sourceIssues.length + targetIssues.length;
         this.TargetIssueOutput = '';
         this.SourceIssueOutput = '';
 
-        if (sourceIssues.length > 0) {
-            this.SourceIssueOutput += `Following files in source was not found in the following target(s):\n`;
-            for (const issue of sourceIssues) {
-                this.SourceIssueOutput += `=>\tFile: ${issue.Path} \n\tMissing from targets: ${issue.MissingTargets}\n`;
+        if (targetIssues.length > 0) {
+            this.TargetIssueOutput += `Links was found in document(s) but does not point to a valid file:\n`;
+            for (const issue of targetIssues) {
+                this.TargetIssueOutput += `\n${this.GetIssueNumber()} Link: ${issue.Path}\n\tDoes not lead to a valid file. Found in document: \n\t\t${issue.InTarget} : Line: ${
+                    issue.Line
+                }\n`;
             }
-            this.SourceIssueOutput += `Please add them to the remaining targets or remove them from disk\n`;
+            this.TargetIssueOutput += '\nPlease fix any typos in the link, or remove the link from the document(s).';
         }
 
-        if (targetIssues.length > 0) {
-            this.TargetIssueOutput += `Following links was found in target(s) but could not find corresponding file in source:\n`;
-            for (const issue of targetIssues) {
-                this.TargetIssueOutput += `=>\tFile: ${issue.Path}\n\tIn target: ${issue.InTarget} : ${issue.Line}\n`;
+        if (sourceIssues.length > 0) {
+            this.SourceIssueOutput += `Following files in folders was not found linked in document(s):\n`;
+            for (const issue of sourceIssues) {
+                this.SourceIssueOutput += `\n${this.GetIssueNumber()} File: ${issue.Path} \n\tIs missing from following document(s):`;
+                for (const missingTarget of issue.MissingTargets) {
+                    this.SourceIssueOutput += `\n\t\t${missingTarget}`;
+                }
+                this.SourceIssueOutput += `\n`;
             }
-            this.TargetIssueOutput += 'Please remove them from the target or make sure the link points to the correct file.\n';
-            this.TargetIssueOutput += 'Note: This often might indicate a typo in the link.\n';
+            this.SourceIssueOutput += `\nPlease add them to the documents listed or remove them from folders.`;
         }
     }
 
     public PrintIssues(): void {
-        console.log(this.SourceIssueOutput);
-        console.log(this.TargetIssueOutput);
+        if (this.TargetIssueOutput === '' && this.SourceIssueOutput === '') {
+            return;
+        }
+        console.error(`▼ ▼ ▼ ▼ ${this.IssueCount} issues needs to be fixed ▼ ▼ ▼\
+            \n${this.TargetIssueOutput}\
+            \n\n${this.SourceIssueOutput}\
+            \n▲ ▲ ▲ ▲ ▲ ▲ ▲ End of issues ▲ ▲ ▲ ▲ ▲ ▲ ▲`);
+    }
+
+    private GetIssueNumber(): string {
+        return `[${this.issueIter++}/${this.IssueCount}] =>`;
     }
 }
