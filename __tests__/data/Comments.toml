@@ -1,0 +1,14 @@
+# [example.0]
+# path = "source_data/00.test"
+# [example.1]
+# path = "source_data/01.test"
+# [example.2]
+# path = "source_data/02.test"
+# [example.3]
+# path = "source_data/subfolderOne/subfolderTwo/03.test"
+# [example.4]
+# path = "source_data/subfolderOne/04.test"
+# [example.5]
+# path = "source_data/subfolderOne/05.test"
+# [example.6]
+# path = "source_data/subfolderOne/06.test"

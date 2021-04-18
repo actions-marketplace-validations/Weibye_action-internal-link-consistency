@@ -1,0 +1,4 @@
+[example.0]
+path = "./data/ignorefolder/07.test"
+[example.1]
+path = "./data/ignorefolder/should_be_ignored.sample"

@@ -1,0 +1,8 @@
+[example.0]
+path = "http://example.com"
+[example.1]
+path = "https://example.com"
+[example.2]
+path = "http://www.example.com"
+[example.3]
+path = "https://example.com"
