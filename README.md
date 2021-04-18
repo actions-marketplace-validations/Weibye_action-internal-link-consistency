@@ -30,50 +30,72 @@ If the action fails, the action tries to output helpful messages to guide the us
 
 ## Settings & Configuration
 
-#### `source-path`
-`Required: True`
-Path to the folder that should be scanned through. 
-```javascript
-source_path: string;
-```
-Set to [`./examples`](https://github.com/bevyengine/bevy/tree/main/examples)
+### `source`
+Defines the path to the folder that the action scans for files. 
+It must be a valid javascript string.
 
-#### `targets`
-`Required: True`
+```yaml
+input_name: source
+required: true
+default: ''
+```
+```javascript
+type: string;
+```
+
+### `targets`
 List of target documents to parse and cross-reference. 
-Target must be defined as:
-```javascript
-targets: string[];
-```
-Set to `["./Cargo.toml", "./examples/README.md"]`
-#### Markdown
-```[`readme_relative_path_to_file.rs`](./relative/path/to/file.rs)```
-#### TOML Path Value
-`path = "relative/path/to/file.rs"`
+It must be a valid javascript string array.
 
-#### `file-types`
+```yaml
+input_name: targets
+required: true
+default: '[]'
+```
+```javascript
+type: string[];
+```
+
+#### Markdown
+```markdown
+[link text](./relative/path/to/file.rs)
+```
+#### TOML Path Value
+```toml
+path = "relative/path/to/file.rs"
+```
+
+### `file-types`
 Whitelist of file-types to look for. 
+It must be a valid javascript string array.
+```yaml
+input_name: file-types
+required: false
+default: '[]'
+```
+```javascript
+type: string[];
+```
 - If empty, collects all files within source-path. 
 - If this contains _any_ entries, the action will _only_ look for those file types.
 Set to `['rs']`
 
-#### `exclude-folders`
+### `exclude-folders`
 List of folders to exclude.
 This setting make sure any files or folders (recursively) are ignored from consideration and cross check.
 This needs to be root-relative paths to folders.
+It must be a valid javascript string array.
 
 ```javascript
 exclude_folders: string[];
 ```
-Set to `['./examples/ios']`
 
-#### `exclude-files`
+### `exclude-files`
 List of files to exclude. 
 This setting make sure any file listed here is ignored from consideration and cross check. 
+It must be a valid javascript string array.
 
 This needs to be an array of root-relative paths to files.
 ```javascript
 exclude_files: string[];
 ```
-
-Set to `[]`
