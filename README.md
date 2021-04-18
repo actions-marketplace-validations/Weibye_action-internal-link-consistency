@@ -1,10 +1,5 @@
-<p align="center">
-    <a href="https://github.com/Weibye/action-internal-link-consistency/actions">
-        <img 
-            alt="action-internal-link-consistency status" 
-            src="https://github.com/Weibye/action-internal-link-consistency/workflows/build-test/badge.svg">
-    </a>
-</p>
+[![CI](https://github.com/Weibye/action-internal-link-consistency/actions/workflows/CI.yml/badge.svg)](https://github.com/Weibye/action-internal-link-consistency/actions/workflows/CI.yml)
+
 
 # Internal Link Consistency Checker
 
