@@ -1,7 +1,7 @@
 import { Config } from '../src/Config';
 import { SourceDataCollector } from '../src/DataCollection/SourceData';
 
-const sourcePath = './__tests__/validData/data/';
+const sourcePath = './__tests__/data/source_data/';
 
 // Source Path
 test('Should be able to collect files from a valid path', async () => {
@@ -60,11 +60,11 @@ test('Should not pick up files without extension if extension is defined', async
 // Ignore files
 test('Should correctly ignore files', async () => {
     const ignoreFilesEmpty: string[] = [];
-    const ignoreFileSingle: string[] = ['./__tests__/validData/data/should_be_ignored.sample'];
+    const ignoreFileSingle: string[] = ['./__tests__/data/source_data/should_be_ignored.sample'];
     const ignoreFileMultiple: string[] = [
-        './__tests__/validData/data/should_be_ignored.sample',
-        './__tests__/validData/data/should_be_ignored.test',
-        './__tests__/validData/data/00.test'
+        './__tests__/data/source_data/should_be_ignored.sample',
+        './__tests__/data/source_data/should_be_ignored.test',
+        './__tests__/data/source_data/00.test'
     ];
 
     const noIgnore = new SourceDataCollector(new Config(sourcePath, [], [], [], ignoreFilesEmpty));
@@ -98,8 +98,8 @@ test('Should correctly ignore files', async () => {
 // Ignore folders
 test('Should correctly ignore folders and files inside those folders', async () => {
     const ignoreFoldersEmpty: string[] = [];
-    const ignoreFoldersSingle: string[] = ['./__tests__/validData/data/ignorefolder'];
-    const ignoreFoldersMultiple: string[] = ['./__tests__/validData/data/ignorefolder', './__tests__/validData/data/subfolderOne'];
+    const ignoreFoldersSingle: string[] = ['./__tests__/data/source_data/ignorefolder'];
+    const ignoreFoldersMultiple: string[] = ['./__tests__/data/source_data/ignorefolder', './__tests__/data/source_data/subfolderOne'];
 
     const noIgnore = new SourceDataCollector(new Config(sourcePath, [], [], ignoreFoldersEmpty));
     expect(noIgnore).toBeDefined();

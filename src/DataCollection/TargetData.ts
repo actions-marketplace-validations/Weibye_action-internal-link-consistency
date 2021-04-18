@@ -42,9 +42,9 @@ export class TargetDataCollector {
         }
 
         for (const data of preProcessor) {
-            if (!ExcludeLink(data.Link)) {
+            if (!this.WebLink(data.Link) && !this.DocLink(data.Link)) {
                 const rootPath = GetRootPath(data.Target.Path, data.Link);
-                if (!ExcludeFile(rootPath, config.ExcludeFiles, config.ExcludeFolders)) {
+                if (this.InTargetScope(rootPath, config.Source) && !ExcludeFile(rootPath, config.ExcludeFiles, config.ExcludeFolders)) {
                     output.push({
                         Details: new FileDetails(rootPath),
                         RelativePath: data.Link,
@@ -57,20 +57,20 @@ export class TargetDataCollector {
         }
         return output;
     }
-}
 
-function ExcludeLink(link: string): boolean {
-    // Exclude comments
-    const tomlComment = /^#/gm;
-    const tomlRes = tomlComment.exec(link);
-    if (tomlRes !== null) return true;
+    private InTargetScope(path: string, scope: string): boolean {
+        return path.includes(scope);
+    }
 
-    // Exclude external links
-    const webLinks = /^https*:\/\//gm;
-    const webResult = webLinks.exec(link);
-    if (webResult !== null) return true;
+    private WebLink(link: string): boolean {
+        const webLinks = /^https*:\/\//gm;
+        return webLinks.exec(link) !== null;
+    }
 
-    return false;
+    private DocLink(link: string): boolean {
+        const docLink = /^#/gm;
+        return docLink.exec(link) !== null;
+    }
 }
 
 function GetLineNr(content: string, charIndex: number): number {

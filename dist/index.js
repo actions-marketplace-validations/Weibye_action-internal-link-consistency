@@ -697,9 +697,9 @@ class TargetDataCollector {
             }
         }
         for (const data of preProcessor) {
-            if (!ExcludeLink(data.Link)) {
+            if (!this.WebLink(data.Link) && !this.DocLink(data.Link)) {
                 const rootPath = GetRootPath(data.Target.Path, data.Link);
-                if (!InclusionController_1.ExcludeFile(rootPath, config.ExcludeFiles, config.ExcludeFolders)) {
+                if (this.InTargetScope(rootPath, config.Source) && !InclusionController_1.ExcludeFile(rootPath, config.ExcludeFiles, config.ExcludeFolders)) {
                     output.push({
                         Details: new FileDetails_1.FileDetails(rootPath),
                         RelativePath: data.Link,
@@ -712,21 +712,19 @@ class TargetDataCollector {
         }
         return output;
     }
+    InTargetScope(path, scope) {
+        return path.includes(scope);
+    }
+    WebLink(link) {
+        const webLinks = /^https*:\/\//gm;
+        return webLinks.exec(link) !== null;
+    }
+    DocLink(link) {
+        const docLink = /^#/gm;
+        return docLink.exec(link) !== null;
+    }
 }
 exports.TargetDataCollector = TargetDataCollector;
-function ExcludeLink(link) {
-    // Exclude comments
-    const tomlComment = /^#/gm;
-    const tomlRes = tomlComment.exec(link);
-    if (tomlRes !== null)
-        return true;
-    // Exclude external links
-    const webLinks = /^https*:\/\//gm;
-    const webResult = webLinks.exec(link);
-    if (webResult !== null)
-        return true;
-    return false;
-}
 function GetLineNr(content, charIndex) {
     const subString = content.substring(0, charIndex);
     return subString.split('\n').length;
@@ -751,11 +749,11 @@ function GetRootPath(targetPath, filePath) {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.defaultTargets = exports.defaultExcludeFolders = exports.defaultExcludeFiles = exports.defaultFileTypes = exports.defaultSource = void 0;
-exports.defaultSource = './__tests__/validData/data/';
+exports.defaultSource = './__tests__/data/source_data/';
 exports.defaultFileTypes = ['test'];
-exports.defaultExcludeFiles = ['./__tests__/validData/data/should_be_ignored.test'];
-exports.defaultExcludeFolders = ['./__tests__/validData/data/ignorefolder'];
-exports.defaultTargets = ['./__tests__/validData/ValidToml.toml', './__tests__/validData/ValidReadme.md'];
+exports.defaultExcludeFiles = ['./__tests__/data/source_data/should_be_ignored.test'];
+exports.defaultExcludeFolders = ['./__tests__/data/source_data/ignorefolder'];
+exports.defaultTargets = ['./__tests__/data/target_documents/toml/ValidToml.toml', './__tests__/data/target_documents/markdown/ValidReadme.md'];
 
 
 /***/ }),
