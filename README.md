@@ -1,111 +1,99 @@
-<p align="center">
-  <a href="https://github.com/Weibye/example_checker/actions"><img alt="example_checker status" src="https://github.com/Weibye/example_checker/workflows/build-test/badge.svg"></a>
-</p>
-
-# Internal File Link-checker
-
-This actions parses a folder recursively for any files and checks if links to these files are present in the defined target documents.
-
-It's main purpose is to ensure all the target documents has valid links to all the files within these folders.
-
-The primary user for this action at this moment is Bevy Engine, where it is used to check if all the examples are in fact listed in the Cargo and Readme documents. This to prevent people from adding new examples but forgetting to list them in the other sources, or removing examples from documents but forgetting to remove them from the source code.
-
-TODO:
-    - Update action.yml
-    - Write tests for the system
-## Usage
+[![CI](https://github.com/Weibye/action-internal-link-consistency/actions/workflows/CI.yml/badge.svg)](https://github.com/Weibye/action-internal-link-consistency/actions/workflows/CI.yml)
 
 
+# Internal Link Consistency Checker
+This actions takes a folder-path and a list of documents as inputs and checks if all the documents contain links to all the files within the folder-path. 
+The primary user for this action is [Bevy](https://github.com/bevyengine/bevy), a game-engine written in rust, in order to make sure new files added to examples also gets added to the appropriate documentation.
 
+### How it works
+1. Looks for files recursively within `source-path` and collects data about the files (source data).
+2. Looks through the documents defined in `targets` and collects data about the links within them (target data).
+3. Cross references source and target data to ensure they agree on the same data.
+4. The action will fail if there are any inconsistencies found.
+If the action fails, the action tries to output helpful messages to guide the user to exactly what needs to be addressed. 
 
-### Target
-
-### Target Style
-#### Markdown
-```[`readme_relative_path_to_file.rs`](./relative/path/to/file.rs)```
-#### TOML Path Value
-`path = "relative/path/to/file.rs"`
-
-### File Ignore
-
-This setting make sure any file listed here is ignored from consideration and cross check. 
-
-This needs to be an array of root-relative paths to files.
-
-
-### Folder Ignore
-This setting make sure any files or folders (recursively) are ignored from consideration and cross check.
-This needs to be root-relative paths to folders.
-### Whitelist FileType
-
-Empty means it scans for all filetypes on disk. 
-
-    
-
-
-----------------------
-
-Closes #1581 
-
-# Internal File/Link Consistency checker Action
-
-This pull request adds an action to the CI that parses the [`./examples`](https://github.com/bevyengine/bevy/tree/main/examples) folder for files and cross references that with the links listed in [`README.md`](https://github.com/bevyengine/bevy/blob/main/examples/README.md) and [`Cargo.toml`](https://github.com/bevyengine/bevy/blob/main/Cargo.toml) to ensure the documentation actually reflects the examples currently in the repo. 
-
-The primary reason for why we want this, is to prevent people from adding new examples but forgetting to also list them in the docs, or accidentally entering broken links (typos in docs).
-
-The action can be found here while I'm working on it, but I'm planning on putting it to the marketplace once I've finished all the remaining tasks (namely writing tests): https://github.com/Weibye/action-internal-link-consistency
-
-## Features & Operation
-1. Looks for files in `source-path` and collects them (source data)
-2. Looks through the documents defined in `targets` and collects the links to files present in them (target data)
-3. Cross references source and target data to ensure they contain the same data.
-4. The action will fail if there are any inconsistencies between source and target and will try to output helpful messages to guide the user to exactly what needs to be addressed. 
-
-- Can look for specific file-types, or everything inside the folder
-- Can ignore specific folders or files, and will ignore references to those both from source or targets.
-- If a folder is ignored, the action will ignore everything inside it. 
+### Features
+- Can look for specific file-types, or all files within folders.
+- Can ignore specific folders or files, and will ignore them from both source or targets.
+- If a folder is ignored, the action will ignore all files and sub-folders inside it. 
 - Supports Mardown links and Toml 'path values' (path = "xxx/yyy/zzz")
 - Ignores links currently commented out
 
- Limitations: 
-- Currently only scans recursively through one folder, but could be extended / improved if needed. (Covers Bevy's use case)
+### Example 
+```yaml
+run-action:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v2
+        - uses: Weibye/action-internal-link-consistency@1.0.0
+            with:
+                source: './__tests__/data/source_data/'
+                targets: '["./__tests__/data/ValidToml.toml", "./__tests__/data/ValidReadme.md"]'
+                file-types: '["test"]'
+                exclude-folders: '["./__tests__/data/source_data/ignorefolder"]'
+                exclude-files: '["./__tests__/data/source_data/should_be_ignored.test"]'
+```
+
+### Current Limitations
+- Only support one source-path, but could be extended / improved if needed. (Covers Bevy's use case)
 - Only supports two specific document targets: `.md` & `.toml` (Covers Bevy's current use case)
 
-## Action Settings
-#### `source-path`
-Path to the folder that should be scanned through. 
-Set to [`./examples`](https://github.com/bevyengine/bevy/tree/main/examples)
+## Settings & Configuration
+### `source`
+Defines the path to the folder that should be scanned for files.
 
-#### `file-types`
+```yaml
+name: source
+required: true
+default: ''
+```
+- Must be parsed to a valid javascript string.
+- Must start with `./` and end with `/`.
+
+### `targets`
+List of target documents to parse and cross-reference. 
+
+```yaml
+name: targets
+required: true
+default: '[]'
+```
+- Must be parsed to a valid javascript string array.
+- Each entry must start with `./`.
+- Each entry must end with a supported document format. (`.md`, `.toml`)
+
+#### Supported Target Document Formats
+For the action to pick up the links within the target documents, they must be defined as following:
+1. Markdown Link: `[link text](./relative/path/to/file.ext)`
+2. Toml (path value): `path = "./relative/path/to/file.ext"`
+
+### `file-types`
 Whitelist of file-types to look for. 
+```yaml
+name: file-types
+required: false
+default: '[]'
+```
+- Must be parsed to a valid javascript string array.
 - If empty, collects all files within source-path. 
 - If this contains _any_ entries, the action will _only_ look for those file types.
-Set to `['rs']`
 
-#### `exclude-folders`
-List of folders to exclude.
-Set to `['./examples/ios']`
-
-#### `exclude-files`
-List of files to exclude. 
-Set to `[]`
-
-#### `targets`
-List of target documents to parse and cross-reference. 
-Target must be defined as:
-```javascript
-{
-    Path: string,
-    Style: number
-}
+### `exclude-folders`
+List of folders to exclude. This setting make sure any files or folders (recursively) are ignored from consideration and cross check.
+```yaml
+name: exclude-folders
+required: false
+default: '[]'
 ```
-Where `Path` is the path to the target document, and `Style` is which document type it is. 
-Style: 0 = Markdown links: `[link test](./relative/path/to/file.rs)`
-Style: 1 = Toml Path values: `path = "relative/path/to/file.rs"`
+- Must be parsed to a valid javascript string array.
+- Each entry must to be root-relative paths to folders.
 
-Set to `[ { "Path": "./Cargo.toml", "Style": 1 }, { "Path": "./examples/README.md", "Style": 0 }]`
-
-## Remaining Tasks
-- Write tests for the action
-- General code cleanup & sanity
-- Have the action automatically detect style from file type (optional)
+### `exclude-files`
+List of files to exclude. This setting make sure any file listed here is ignored from consideration and cross check. 
+```yaml
+name: exclude-files
+required: false
+default: '[]'
+```
+- Must be parsed to a valid javascript string array.
+- Each entry must to be root-relative paths to files.

@@ -1,26 +1,26 @@
-name: 'example_checker'
-description: 'Action to cross reference examples in source code, README.md and Cargo.toml to ensure they contain the same info.'
+name: 'action-internal-link-consistency'
+description: 'Action to cross internal links between folders and documents to ensure they agree on the same data.'
 author: 'Andreas Weibye'
 inputs:
   source:
     required: true
-    description: 'path to source folder to be scanned, relative to the root of the repo'
-    default: './examples/'
+    description: 'Defines the path to the folder that should be scanned for files'
+    default: ''
   targets:
     required: true
-    description: 'Some description'
-    default: '["./examples/README.md", "./Cargo.toml"]'
+    description: 'List of target documents to parse and cross-reference.'
+    default: '[]'
   file-types:
     required: false
-    description: 'TODO'
+    description: 'Whitelist of file-types to look for.'
     default: '[]'
   exclude-folders:
     required: false
-    description: 'TODO'
+    description: 'List of folders to exclude from cross-check.'
     default: '[]'
   exclude-files:
     required: false
-    description: 'TODO'
+    description: 'List of files to exclude from cross-check.'
     default: '[]'
 branding:
   icon: 'check-circle'
