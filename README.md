@@ -26,12 +26,12 @@ run-action:
     steps:
         - uses: actions/checkout@v2
         - uses: Weibye/action-internal-link-consistency@1.0.0
-        with:
-            source: './__tests__/data/source_data/'
-            targets: '["./__tests__/data/ValidToml.toml", "./__tests__/data/ValidReadme.md"]'
-            file-types: '["test"]'
-            exclude-folders: '["./__tests__/data/source_data/ignorefolder"]'
-            exclude-files: '["./__tests__/data/source_data/should_be_ignored.test"]'
+            with:
+                source: './__tests__/data/source_data/'
+                targets: '["./__tests__/data/ValidToml.toml", "./__tests__/data/ValidReadme.md"]'
+                file-types: '["test"]'
+                exclude-folders: '["./__tests__/data/source_data/ignorefolder"]'
+                exclude-files: '["./__tests__/data/source_data/should_be_ignored.test"]'
 ```
 
 ### Current Limitations
@@ -40,69 +40,60 @@ run-action:
 
 ## Settings & Configuration
 ### `source`
-Defines the path to the folder that the action scans for files. 
-It must be a valid javascript string.
+Defines the path to the folder that should be scanned for files.
 
 ```yaml
 name: source
-type: string
 required: true
 default: ''
 ```
+- Must be parsed to a valid javascript string.
+- Must start with `./` and end with `/`.
 
 ### `targets`
 List of target documents to parse and cross-reference. 
-It must be a valid javascript string array.
 
 ```yaml
 name: targets
-type: string[]
 required: true
 default: '[]'
 ```
+- Must be parsed to a valid javascript string array.
+- Each entry must start with `./`.
+- Each entry must end with a supported document format. (`.md`, `.toml`)
 
-#### Markdown
-```markdown
-[link text](./relative/path/to/file.rs)
-```
-#### TOML Path Value
-```toml
-path = "relative/path/to/file.rs"
-```
+#### Supported Target Document Formats
+For the action to pick up the links within the target documents, they must be defined as following:
+1. Markdown Link: `[link text](./relative/path/to/file.ext)`
+2. Toml (path value): `path = "./relative/path/to/file.ext"`
 
 ### `file-types`
 Whitelist of file-types to look for. 
-It must be a valid javascript string array.
 ```yaml
 name: file-types
-type: string[]
 required: false
 default: '[]'
 ```
+- Must be parsed to a valid javascript string array.
 - If empty, collects all files within source-path. 
 - If this contains _any_ entries, the action will _only_ look for those file types.
 
 ### `exclude-folders`
-List of folders to exclude.
+List of folders to exclude. This setting make sure any files or folders (recursively) are ignored from consideration and cross check.
 ```yaml
 name: exclude-folders
-type: string[]
 required: false
 default: '[]'
 ```
-This setting make sure any files or folders (recursively) are ignored from consideration and cross check.
-This needs to be root-relative paths to folders.
-It must be a valid javascript string array.
+- Must be parsed to a valid javascript string array.
+- Each entry must to be root-relative paths to folders.
 
 ### `exclude-files`
-List of files to exclude. 
+List of files to exclude. This setting make sure any file listed here is ignored from consideration and cross check. 
 ```yaml
 name: exclude-files
-type: string[]
 required: false
 default: '[]'
 ```
-This setting make sure any file listed here is ignored from consideration and cross check. 
-It must be a valid javascript string array.
-
-This needs to be an array of root-relative paths to files.
+- Must be parsed to a valid javascript string array.
+- Each entry must to be root-relative paths to files.
