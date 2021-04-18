@@ -1,5 +1,5 @@
-name: 'example_checker'
-description: 'Action to cross reference examples in source code, README.md and Cargo.toml to ensure they contain the same info.'
+name: 'action-internal-link-consistency'
+description: 'Action to cross internal links between folders and documents to ensure they agree on the same data.'
 author: 'Andreas Weibye'
 inputs:
   source:
