@@ -753,7 +753,7 @@ exports.defaultSource = './__tests__/data/source_data/';
 exports.defaultFileTypes = ['test'];
 exports.defaultExcludeFiles = ['./__tests__/data/source_data/should_be_ignored.test'];
 exports.defaultExcludeFolders = ['./__tests__/data/source_data/ignorefolder'];
-exports.defaultTargets = ['./__tests__/data/target_documents/toml/ValidToml.toml', './__tests__/data/target_documents/markdown/ValidReadme.md'];
+exports.defaultTargets = ['./__tests__/data/ValidToml.toml', './__tests__/data/ValidReadme.md'];
 
 
 /***/ }),

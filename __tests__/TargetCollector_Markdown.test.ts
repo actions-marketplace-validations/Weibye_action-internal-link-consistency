@@ -8,7 +8,7 @@ const sourcePath = './__tests__/data/source_data/';
  */
 
 test('Should read from a valid file', async () => {
-    const data = new TargetDataCollector(new Config(sourcePath, ['./__tests__/data/target_documents/markdown/ValidReadme.md']));
+    const data = new TargetDataCollector(new Config(sourcePath, ['./__tests__/data/ValidReadme.md']));
     expect(data).toBeDefined();
     expect(data.TargetData).toBeDefined();
     expect(data.TargetData.length).toBeGreaterThan(0);
@@ -27,7 +27,7 @@ test('Should read from a valid file', async () => {
 });
 
 test('Empty document should report no results', async () => {
-    const data = new TargetDataCollector(new Config(sourcePath, ['./__tests__/data/target_documents/markdown/EmptyReadme.md']));
+    const data = new TargetDataCollector(new Config(sourcePath, ['./__tests__/data/EmptyReadme.md']));
     expect(data).toBeDefined();
     expect(data.TargetData).toBeDefined();
     expect(data.TargetData.length).toEqual(1);
@@ -38,7 +38,7 @@ test('Empty document should report no results', async () => {
 });
 
 test('Document with content but no relative links should report no results', async () => {
-    const data = new TargetDataCollector(new Config(sourcePath, ['./__tests__/data/target_documents/markdown/MarkdownExample.md']));
+    const data = new TargetDataCollector(new Config(sourcePath, ['./__tests__/data/MarkdownExample.md']));
     expect(data).toBeDefined();
     expect(data.TargetData).toBeDefined();
     expect(data.TargetData.length).toEqual(1);
@@ -50,7 +50,7 @@ test('Document with content but no relative links should report no results', asy
 
 test('Should not pick up links outside the scope of source', async () => {
     // Scope is ./__tests__/validData/data/*
-    const data = new TargetDataCollector(new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/OutOfScope.md']));
+    const data = new TargetDataCollector(new Config('./__tests__/data/source_data/', ['./__tests__/data/OutOfScope.md']));
     expect(data).toBeDefined();
     expect(data.TargetData).toBeDefined();
     expect(data.TargetData.length).toEqual(1);
@@ -61,7 +61,7 @@ test('Should not pick up links outside the scope of source', async () => {
 });
 
 test('Should not pick up external links from document', async () => {
-    const data = new TargetDataCollector(new Config(sourcePath, ['./__tests__/data/target_documents/markdown/ExternalLinks.md']));
+    const data = new TargetDataCollector(new Config(sourcePath, ['./__tests__/data/ExternalLinks.md']));
     expect(data).toBeDefined();
     expect(data.TargetData).toBeDefined();
     expect(data.TargetData.length).toEqual(1);
@@ -72,7 +72,7 @@ test('Should not pick up external links from document', async () => {
 });
 
 test('Should not pick up doc links to titles / other sections of the document', async () => {
-    const data = new TargetDataCollector(new Config(sourcePath, ['./__tests__/data/target_documents/markdown/DocLinks.md']));
+    const data = new TargetDataCollector(new Config(sourcePath, ['./__tests__/data/DocLinks.md']));
     expect(data).toBeDefined();
     expect(data.TargetData).toBeDefined();
     expect(data.TargetData.length).toEqual(1);
@@ -86,7 +86,7 @@ test('Links to ignored files should be ignored', async () => {
     const data = new TargetDataCollector(
         new Config(
             sourcePath,
-            ['./__tests__/data/target_documents/markdown/IgnoreFiles.md'],
+            ['./__tests__/data/IgnoreFiles.md'],
             [],
             [],
             ['./__tests__/data/source_data/ignorefolder/07.test', './__tests__/data/source_data/ignorefolder/should_be_ignored.sample']
@@ -102,9 +102,7 @@ test('Links to ignored files should be ignored', async () => {
 });
 
 test('Links to files in ignored folders should be ignored', async () => {
-    const data = new TargetDataCollector(
-        new Config(sourcePath, ['./__tests__/data/target_documents/markdown/IgnoreFiles.md'], [], ['./__tests__/data/source_data/ignorefolder'], [])
-    );
+    const data = new TargetDataCollector(new Config(sourcePath, ['./__tests__/data/IgnoreFiles.md'], [], ['./__tests__/data/source_data/ignorefolder'], []));
     expect(data).toBeDefined();
     expect(data.TargetData).toBeDefined();
     expect(data.TargetData.length).toEqual(1);
@@ -115,7 +113,7 @@ test('Links to files in ignored folders should be ignored', async () => {
 });
 
 test('Should not pick up links that are commented out', async () => {
-    const data = new TargetDataCollector(new Config(sourcePath, ['./__tests__/data/target_documents/markdown/Comments.md']));
+    const data = new TargetDataCollector(new Config(sourcePath, ['./__tests__/data/Comments.md']));
     expect(data).toBeDefined();
     expect(data.TargetData).toBeDefined();
     expect(data.TargetData.length).toEqual(1);

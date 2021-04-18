@@ -6,7 +6,7 @@ test('Valid config should be valid', async () => {
     const fileTypes = ['file', 'types'];
     const excludeFolders = ['./exclude/folder', './other/folder'];
     const excludeFiles = ['./exclude/file.type', './exclude/other/file.type'];
-    const targets = ['./__tests__/data/target_documents/markdown/ValidReadme.md', './__tests__/data/target_documents/toml/ValidToml.toml'];
+    const targets = ['./__tests__/data/ValidReadme.md', './__tests__/data/ValidToml.toml'];
     const configObject = new Config(source, targets, fileTypes, excludeFolders, excludeFiles);
 
     expect(configObject).toBeDefined();
@@ -77,69 +77,67 @@ test('Target must be a valid string', async () => {
     expect(() => new Config('./__tests__/data/source_data/', [''])).toThrowError();
 });
 test('Target path must start with ./', async () => {
-    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md'])).toBeDefined();
-    expect(() => new Config('./__tests__/data/source_data/', ['__tests__/data/target_documents/markdown/ValidReadme.md'])).toThrowError();
+    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'])).toBeDefined();
+    expect(() => new Config('./__tests__/data/source_data/', ['__tests__/data/ValidReadme.md'])).toThrowError();
 });
 test('Target path must not end with /', async () => {
-    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md'])).toBeDefined();
-    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md/'])).toThrowError();
+    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'])).toBeDefined();
+    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md/'])).toThrowError();
 });
 test('Target must exist', async () => {
-    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md'])).toBeDefined();
+    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'])).toBeDefined();
     expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/validData/NonExisting.md'])).toThrowError();
 });
 test('Target must be supported file type', async () => {
-    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md'])).toBeDefined();
+    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'])).toBeDefined();
     expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/validData/ValidReadme.notsupported'])).toThrowError();
 });
 
 // FILE TYPES
 // empty file types should produce a valid config
 test('No file-types is valid', async () => {
-    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md'])).toBeDefined();
+    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'])).toBeDefined();
 });
 test('File-type entry should not be empty', async () => {
-    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md'], [''])).toThrowError();
+    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [''])).toThrowError();
 });
 // should not start with . at the start of the file-type / extension
 test('File-type must not start with .', async () => {
-    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md'], ['.test'])).toThrowError();
+    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], ['.test'])).toThrowError();
 });
 test('File-type must not end with /', async () => {
-    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md'], ['test/'])).toThrowError();
+    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], ['test/'])).toThrowError();
 });
 
 // EXCLUDE FOLDERS
 test('No exclude folders is valid', async () => {
-    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md'], [], [])).toBeDefined();
+    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], [])).toBeDefined();
 });
 test('Folder path should start with ./', async () => {
-    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md'], [], ['exclude/folder'])).toThrowError();
+    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], ['exclude/folder'])).toThrowError();
 });
 test('Folder path must be not empty', async () => {
-    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md'], [], [''])).toThrowError();
+    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], [''])).toThrowError();
 });
 test('Should not matter if folder path ends with "/" or not', async () => {
-    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md'], [], ['./exclude/folder'])).toBeDefined();
-    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md'], [], ['./exclude/folder/'])).toBeDefined();
+    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], ['./exclude/folder'])).toBeDefined();
+    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], ['./exclude/folder/'])).toBeDefined();
 });
 test('Should not matter if folder exists or not', async () => {
-    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md'], [], ['./imaginary/folder/'])).toBeDefined();
-    expect(
-        new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md'], [], ['./__tests__/data/source_data/ignorefolder/'])
-    ).toBeDefined();
+    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], ['./imaginary/folder/'])).toBeDefined();
+    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], ['./__tests__/data/source_data/ignorefolder/'])).toBeDefined();
 });
 
 // EXCLUDE FILES
 test('No exclude files is valid', async () => {
-    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md'], [], [], [])).toBeDefined();
+    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], [], [])).toBeDefined();
 });
 test('Exclude file-path should start with ./', async () => {
-    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md'], [], [], ['exclude/file'])).toThrowError();
+    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], [], ['exclude/file'])).toThrowError();
 });
 test('Exclude file-path should not end with /', async () => {
-    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md'], [], [], ['./exclude/file/'])).toThrowError();
+    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], [], ['./exclude/file/'])).toThrowError();
 });
 test('Exclude file-path must be not empty', async () => {
-    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/target_documents/markdown/ValidReadme.md'], [], [], [''])).toThrowError();
+    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], [], [''])).toThrowError();
 });
