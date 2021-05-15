@@ -12,7 +12,7 @@ export class IssueLogger {
         this.SourceIssueOutput = '';
 
         if (targetIssues.length > 0) {
-            this.TargetIssueOutput += `Links was found in document(s) but does not point to a valid file:\n`;
+            this.TargetIssueOutput += `Link(s) was found in document(s) but does not point to a valid file:\n`;
             for (const issue of targetIssues) {
                 this.TargetIssueOutput += `\n${this.GetIssueNumber()} Link: ${issue.Path}\n\tDoes not lead to a valid file. Found in document: \n\t\t${issue.InTarget} : Line: ${
                     issue.Line
@@ -38,10 +38,10 @@ export class IssueLogger {
         if (this.TargetIssueOutput === '' && this.SourceIssueOutput === '') {
             return;
         }
-        console.error(`▼ ▼ ▼ ▼ ${this.IssueCount} issues needs to be fixed ▼ ▼ ▼\
+        console.error(`▼ ▼ ▼ ▼ ${this.IssueCount} issue(s) need to be fixed ▼ ▼ ▼\
             \n${this.TargetIssueOutput}\
             \n\n${this.SourceIssueOutput}\
-            \n▲ ▲ ▲ ▲ ▲ ▲ ▲ End of issues ▲ ▲ ▲ ▲ ▲ ▲ ▲`);
+            \n▲ ▲ ▲ ▲ ▲ ▲ ▲ End of issue(s) ▲ ▲ ▲ ▲ ▲ ▲ ▲`);
     }
 
     private GetIssueNumber(): string {
