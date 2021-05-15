@@ -1,4 +1,4 @@
-// import { readFileSync } from 'fs';
+import { resolve } from 'path';
 import { Config } from '../Config';
 import { FileDetails } from '../FileDetails';
 import { ExcludeFile } from '../InclusionController';
