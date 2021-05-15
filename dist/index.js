@@ -197,6 +197,7 @@ exports.getInput = getInput;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function setOutput(name, value) {
+    process.stdout.write(os.EOL);
     command_1.issueCommand('set-output', { name }, value);
 }
 exports.setOutput = setOutput;
@@ -400,9 +401,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Config = void 0;
 const fs_1 = __nccwpck_require__(747);
 const FileDetails_1 = __nccwpck_require__(8);
+const SupportedFormats_1 = __nccwpck_require__(779);
 class Config {
     constructor(source, targets, fileTypes, excludeFolders, excludeFiles) {
-        this.SupportedFormats = this.GetSupportedFormats();
+        this.SupportedFormats = SupportedFormats_1.SupportedFormats;
         // SOURCE
         this.Source = this.SourceValidation(source);
         // TARGETS
@@ -533,24 +535,6 @@ class Config {
             }
         }
         return filePaths;
-    }
-    GetSupportedFormats() {
-        const formats = [];
-        const formatContent = fs_1.readFileSync('./src/SupportedFormats.json', { encoding: 'utf-8' });
-        if (formatContent === undefined || formatContent === '')
-            throw new Error('Invalid Supported format document');
-        const supportedFormats = JSON.parse(formatContent);
-        if (supportedFormats === undefined)
-            throw new Error('Invalid format in SupportedFormats.json');
-        if (supportedFormats.length <= 0)
-            throw new Error('No supported formats found in SupportedFormats.json');
-        for (const formatData of supportedFormats) {
-            formats.push({
-                Extension: formatData.Extension,
-                Pattern: new RegExp(formatData.Pattern, 'gm')
-            });
-        }
-        return formats;
     }
 }
 exports.Config = Config;
@@ -1083,6 +1067,26 @@ class Setup {
     }
 }
 exports.Setup = Setup;
+
+
+/***/ }),
+
+/***/ 779:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.SupportedFormats = void 0;
+exports.SupportedFormats = [
+    {
+        Extension: 'md',
+        Pattern: /^(?!<!--).*\[[^[]+\]\(([^)]+)\)/gm
+    },
+    {
+        Extension: 'toml',
+        Pattern: /^(?!#).*path\s=\s"(.*)"$/gm
+    }
+];
 
 
 /***/ }),
