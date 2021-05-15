@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'fs';
 import { FileDetails } from './FileDetails';
 import { ITarget, IRegFormat } from './Interfaces';
+import { SupportedFormats } from './SupportedFormats';
 
 export class Config {
     public Source: string;
@@ -13,7 +14,7 @@ export class Config {
     public Targets: ITarget[];
 
     public constructor(source: string, targets: string[], fileTypes?: string[], excludeFolders?: string[], excludeFiles?: string[]) {
-        this.SupportedFormats = this.GetSupportedFormats();
+        this.SupportedFormats = SupportedFormats;
 
         // SOURCE
         this.Source = this.SourceValidation(source);
@@ -157,23 +158,5 @@ export class Config {
             }
         }
         return filePaths;
-    }
-
-    private GetSupportedFormats(): IRegFormat[] {
-        const formats: IRegFormat[] = [];
-        const formatContent = readFileSync('./src/SupportedFormats.json', { encoding: 'utf-8' });
-        if (formatContent === undefined || formatContent === '') throw new Error('Invalid Supported format document');
-
-        const supportedFormats: [{ Extension: string; Pattern: string }] = JSON.parse(formatContent);
-        if (supportedFormats === undefined) throw new Error('Invalid format in SupportedFormats.json');
-        if (supportedFormats.length <= 0) throw new Error('No supported formats found in SupportedFormats.json');
-
-        for (const formatData of supportedFormats) {
-            formats.push({
-                Extension: formatData.Extension,
-                Pattern: new RegExp(formatData.Pattern, 'gm')
-            });
-        }
-        return formats;
     }
 }
