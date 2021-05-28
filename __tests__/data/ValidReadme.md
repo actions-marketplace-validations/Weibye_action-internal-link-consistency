@@ -4,4 +4,5 @@
 [`link text`](./source_data/subfolderOne/subfolderTwo/03.test)
 [`link text`](./source_data/subfolderOne/04.test)
 [`link text`](./source_data/subfolderOne/05.test)
-[`link text`](./source_data/subfolderOne/06.test)
+[`link text`](source_data/subfolderOne/06.test)
+[`link text`](../outside.test)
