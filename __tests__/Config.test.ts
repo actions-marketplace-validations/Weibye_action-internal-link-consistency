@@ -2,10 +2,10 @@ import { Config } from '../src/Config';
 
 // CONFIG
 test('Valid config should be valid', async () => {
-    const source = './__tests__/data/source_data/';
+    const source = '__tests__/data/source_data/';
     const fileTypes = ['file', 'types'];
-    const excludeFolders = ['./exclude/folder', './other/folder'];
-    const excludeFiles = ['./exclude/file.type', './exclude/other/file.type'];
+    const excludeFolders = ['__tests__/data/source_data/ignorefolder'];
+    const excludeFiles = ['./__tests__/data/source_data/should_be_ignored.test'];
     const targets = ['./__tests__/data/ValidReadme.md', './__tests__/data/ValidToml.toml'];
     const configObject = new Config(source, targets, fileTypes, excludeFolders, excludeFiles);
 
@@ -16,17 +16,6 @@ test('Valid config should be valid', async () => {
     expect(configObject.ExcludeFolders).toBeDefined();
     expect(configObject.Targets).toBeDefined();
 
-    expect(configObject.Source).toEqual(source);
-    expect(configObject.FileTypes).toEqual(fileTypes);
-    expect(configObject.ExcludeFolders).toEqual(excludeFolders);
-    expect(configObject.ExcludeFiles).toEqual(excludeFiles);
-    for (const target of configObject.Targets) {
-        expect(target.Path).toBeDefined();
-        expect(target.Extension).toBeDefined();
-        expect(target.Pattern).toBeDefined();
-        expect(targets.some(e => e === target.Path)).toBeTruthy();
-    }
-    // This is not true
     const optionalConf = new Config(source, targets);
     expect(optionalConf).toBeDefined();
     expect(optionalConf.Source).toBeDefined();
@@ -35,13 +24,6 @@ test('Valid config should be valid', async () => {
     expect(optionalConf.ExcludeFolders).toBeDefined();
     expect(optionalConf.Targets).toBeDefined();
 
-    expect(optionalConf.Source).toEqual(source);
-    for (const target of optionalConf.Targets) {
-        expect(target.Path).toBeDefined();
-        expect(target.Extension).toBeDefined();
-        expect(target.Pattern).toBeDefined();
-        expect(targets.some(e => e === target.Path)).toBeTruthy();
-    }
     expect(optionalConf.FileTypes).toEqual([]);
     expect(optionalConf.ExcludeFolders).toEqual([]);
     expect(optionalConf.ExcludeFiles).toEqual([]);
@@ -49,40 +31,15 @@ test('Valid config should be valid', async () => {
 
 // SOURCE PATH
 test('Source path must be a valid string', async () => {
-    expect(() => new Config('', [])).toThrowError();
-});
-test('Source path must start with ./', async () => {
-    const source = './__tests__/data/source_data/';
-    const notValidSource: string = 'path/';
-    const configObject = new Config(source, []);
-
-    expect(configObject).toBeDefined();
-    expect(() => new Config(notValidSource, [])).toThrowError();
-});
-test('Source path must end with /', async () => {
-    const source = './__tests__/data/source_data/';
-    const notValidSource: string = './path';
-
-    const configObject = new Config(source, []);
-
-    expect(configObject).toBeDefined();
-    expect(() => new Config(notValidSource, [])).toThrowError();
+    expect(() => new Config('', ['./__tests__/data/ValidReadme.md'])).toThrowError();
 });
 test('Source path must exist', async () => {
-    expect(() => new Config('./not_existing/', [])).toThrowError();
+    expect(() => new Config('./not_existing/', ['./__tests__/data/ValidReadme.md'])).toThrowError();
 });
 
 // TARGETS
 test('Target must be a valid string', async () => {
     expect(() => new Config('./__tests__/data/source_data/', [''])).toThrowError();
-});
-test('Target path must start with ./', async () => {
-    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'])).toBeDefined();
-    expect(() => new Config('./__tests__/data/source_data/', ['__tests__/data/ValidReadme.md'])).toThrowError();
-});
-test('Target path must not end with /', async () => {
-    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'])).toBeDefined();
-    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md/'])).toThrowError();
 });
 test('Target must exist', async () => {
     expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'])).toBeDefined();
@@ -101,27 +58,10 @@ test('No file-types is valid', async () => {
 test('File-type entry should not be empty', async () => {
     expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [''])).toThrowError();
 });
-// should not start with . at the start of the file-type / extension
-test('File-type must not start with .', async () => {
-    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], ['.test'])).toThrowError();
-});
-test('File-type must not end with /', async () => {
-    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], ['test/'])).toThrowError();
-});
 
 // EXCLUDE FOLDERS
-test('No exclude folders is valid', async () => {
+test('No exclude folders should produce a valid config', async () => {
     expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], [])).toBeDefined();
-});
-test('Folder path should start with ./', async () => {
-    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], ['exclude/folder'])).toThrowError();
-});
-test('Folder path must be not empty', async () => {
-    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], [''])).toThrowError();
-});
-test('Should not matter if folder path ends with "/" or not', async () => {
-    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], ['./exclude/folder'])).toBeDefined();
-    expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], ['./exclude/folder/'])).toBeDefined();
 });
 test('Should not matter if folder exists or not', async () => {
     expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], ['./imaginary/folder/'])).toBeDefined();
@@ -131,12 +71,6 @@ test('Should not matter if folder exists or not', async () => {
 // EXCLUDE FILES
 test('No exclude files is valid', async () => {
     expect(new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], [], [])).toBeDefined();
-});
-test('Exclude file-path should start with ./', async () => {
-    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], [], ['exclude/file'])).toThrowError();
-});
-test('Exclude file-path should not end with /', async () => {
-    expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], [], ['./exclude/file/'])).toThrowError();
 });
 test('Exclude file-path must be not empty', async () => {
     expect(() => new Config('./__tests__/data/source_data/', ['./__tests__/data/ValidReadme.md'], [], [], [''])).toThrowError();
