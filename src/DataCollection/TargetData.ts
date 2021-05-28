@@ -14,8 +14,7 @@ export class TargetDataCollector {
         for (const target of config.Targets) {
             const data = this.GetTargetData(target, config);
             if (data.length >= 0) {
-                // console.log(`Found ${data.length} entries in ${target.Path}`);
-                this.TargetData.push({ Target: target.Path, Data: data });
+                this.TargetData.push({ Target: target.FullPath, Data: data });
             }
         }
     }
@@ -25,7 +24,7 @@ export class TargetDataCollector {
         const output: ITargetData[] = [];
 
         // Read the contents of the file
-        const content = ReadFileFromPath(target.Path);
+        const content = ReadFileFromPath(target.FullPath);
         if (content.length <= 0) return [];
 
         const preProcessor: { Orig: string; Link: string; Target: ITarget; Line: number }[] = [];
