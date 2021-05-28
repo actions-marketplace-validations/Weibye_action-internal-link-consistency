@@ -6,7 +6,7 @@ This actions takes a folder-path and a list of documents as inputs and checks if
 The primary user for this action is [Bevy](https://github.com/bevyengine/bevy), a game-engine written in rust, in order to make sure new files added to examples also gets added to the appropriate documentation.
 
 ### How it works
-1. Looks for files recursively within `source-path` and collects data about the files (source data).
+1. Looks for files recursively within `source` and collects data about the files (source data).
 2. Looks through the documents defined in `targets` and collects data about the links within them (target data).
 3. Cross references source and target data to ensure they agree on the same data.
 4. The action will fail if there are any inconsistencies found.
@@ -25,13 +25,13 @@ run-action:
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@v2
-        - uses: Weibye/action-internal-link-consistency@1.0.0
+        - uses: Weibye/action-internal-link-consistency@1.1.0
             with:
-                source: './__tests__/data/source_data/'
-                targets: '["./__tests__/data/ValidToml.toml", "./__tests__/data/ValidReadme.md"]'
-                file-types: '["test"]'
-                exclude-folders: '["./__tests__/data/source_data/ignorefolder"]'
-                exclude-files: '["./__tests__/data/source_data/should_be_ignored.test"]'
+                source: '__tests__/data/source_data/'
+                targets: '["__tests__/data/ValidToml.toml", "./__tests__/data/ValidReadme.md"]'
+                file-types: '[".test"]'
+                exclude-folders: '["__tests__/data/source_data/ignorefolder"]'
+                exclude-files: '["__tests__/data/source_data/should_be_ignored.test"]'
 ```
 
 ### Current Limitations
@@ -48,7 +48,7 @@ required: true
 default: ''
 ```
 - Must be parsed to a valid javascript string.
-- Must start with `./` and end with `/`.
+- Should be a valid folder on disk.
 
 ### `targets`
 List of target documents to parse and cross-reference. 
@@ -59,7 +59,6 @@ required: true
 default: '[]'
 ```
 - Must be parsed to a valid javascript string array.
-- Each entry must start with `./`.
 - Each entry must end with a supported document format. (`.md`, `.toml`)
 
 #### Supported Target Document Formats
@@ -75,6 +74,7 @@ required: false
 default: '[]'
 ```
 - Must be parsed to a valid javascript string array.
+- Extensions must start with `.` (dot).
 - If empty, collects all files within source-path. 
 - If this contains _any_ entries, the action will _only_ look for those file types.
 
