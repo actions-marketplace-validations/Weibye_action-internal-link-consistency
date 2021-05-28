@@ -1,4 +1,5 @@
 import { Dirent, readdirSync } from 'fs';
+import { join } from 'path';
 import { Config } from '../Config';
 import { FileDetails } from '../FileDetails';
 import { IncludeFile, IncludeFolder } from '../InclusionController';
@@ -8,30 +9,27 @@ export class SourceDataCollector {
 
     public constructor(config: Config) {
         this.FileDetails = this.GetSourceData(config.Source, config);
-        // console.log(`Found ${this.FileDetails.length} entries in ${config.Source}`);
     }
 
     private GetSourceData(path: string, config: Config): FileDetails[] {
         let files: FileDetails[] = [];
-
         const dirs: Dirent[] = readdirSync(path, { withFileTypes: true });
 
         for (const element of dirs) {
+            const elementPath = join(path, element.name);
+
             if (element.isDirectory()) {
-                if (IncludeFolder(path + element.name, config)) {
-                    files = files.concat(this.GetSourceData(`${path}${element.name}/`, config));
-                } else {
-                    // console.log(`Folder excluded: ${path}${element.name}`);
+                if (IncludeFolder(elementPath, config)) {
+                    files = files.concat(this.GetSourceData(elementPath, config));
                 }
             } else {
-                const fileDetails = new FileDetails(path + element.name);
+                const fileDetails = new FileDetails(elementPath);
                 // Only check files that are whitelisted and not excluded
                 if (IncludeFile(fileDetails, config)) {
                     files.push(fileDetails);
                 }
             }
         }
-
         return files;
     }
 }

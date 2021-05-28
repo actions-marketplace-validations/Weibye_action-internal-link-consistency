@@ -25,7 +25,7 @@ export class CrossReferencer {
             const missingFromTarget: string[] = [];
 
             for (const clonedTargetData of clonedTarget) {
-                const match = clonedTargetData.Data.find(e => e.Details.SourcePath === source.SourcePath);
+                const match = clonedTargetData.Data.find(e => e.Details.FullPath === source.FullPath);
                 if (match !== undefined) {
                     // Add to the match count
                     matchesCount++;
@@ -40,18 +40,18 @@ export class CrossReferencer {
                 // Do nothing, it is present in all targets
             } else if (matchesCount === 0) {
                 // not present in any targets
-                this.MissingFromTargets.push({ Path: source.SourcePath, MissingTargets: targetData.map(e => e.Target) });
+                this.MissingFromTargets.push({ Path: source.FullPath, MissingTargets: targetData.map(e => e.Target) });
             } else {
                 // File present in some, but not all targets
-                this.MissingFromTargets.push({ Path: source.SourcePath, MissingTargets: missingFromTarget });
+                this.MissingFromTargets.push({ Path: source.FullPath, MissingTargets: missingFromTarget });
             }
         }
 
         for (const target of clonedTarget) {
             for (const data of target.Data) {
                 this.MissingFromSource.push({
-                    Path: data.Details.SourcePath,
-                    InTarget: data.ParentFile.Path,
+                    Path: data.Details.FullPath,
+                    InTarget: data.ParentFile.FullPath,
                     Line: data.LineNr
                 });
             }

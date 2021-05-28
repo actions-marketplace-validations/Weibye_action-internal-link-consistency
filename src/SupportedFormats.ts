@@ -1,12 +1,12 @@
-import { IRegFormat } from './Interfaces';
+import { ISupportedFormat } from './Interfaces';
 
-export const SupportedFormats: IRegFormat[] = [
+export const SupportedFormats: ISupportedFormat[] = [
     {
-        Extension: 'md',
+        Ext: '.md',
         Pattern: /^(?!<!--).*\[[^[]+\]\(([^)]+)\)/gm
     },
     {
-        Extension: 'toml',
+        Ext: '.toml',
         Pattern: /^(?!#).*path\s=\s"(.*)"$/gm
     }
 ];

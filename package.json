@@ -14,7 +14,8 @@
         "test:dev": "nodemon --watch __tests__ -e ts --exec \"npm run test\"",
         "all": "npm run format && npm run lint && npm run test && npm run package && npm run start",
         "dev": "nodemon --watch src -e ts,ejs --exec \"npm run package && npm run start\"",
-        "start": "node ."
+        "start": "node .",
+        "start:dev": "nodemon --watch src -e,esj --exec \"npm run package && npm run start\""
     },
     "repository": {
         "type": "git",

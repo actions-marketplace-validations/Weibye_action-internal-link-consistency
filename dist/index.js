@@ -1,5 +1,4 @@
-require('./sourcemap-register.js');module.exports =
-/******/ (() => { // webpackBootstrap
+require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
@@ -7,14 +6,27 @@ require('./sourcemap-register.js');module.exports =
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.issue = exports.issueCommand = void 0;
 const os = __importStar(__nccwpck_require__(87));
 const utils_1 = __nccwpck_require__(278);
 /**
@@ -92,6 +104,25 @@ function escapeProperty(s) {
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -101,14 +132,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getState = exports.saveState = exports.group = exports.endGroup = exports.startGroup = exports.info = exports.warning = exports.error = exports.debug = exports.isDebug = exports.setFailed = exports.setCommandEcho = exports.setOutput = exports.getBooleanInput = exports.getInput = exports.addPath = exports.setSecret = exports.exportVariable = exports.ExitCode = void 0;
 const command_1 = __nccwpck_require__(351);
 const file_command_1 = __nccwpck_require__(717);
 const utils_1 = __nccwpck_require__(278);
@@ -175,7 +200,9 @@ function addPath(inputPath) {
 }
 exports.addPath = addPath;
 /**
- * Gets the value of an input.  The value is also trimmed.
+ * Gets the value of an input.
+ * Unless trimWhitespace is set to false in InputOptions, the value is also trimmed.
+ * Returns an empty string if the value is not defined.
  *
  * @param     name     name of the input to get
  * @param     options  optional. See InputOptions.
@@ -186,9 +213,34 @@ function getInput(name, options) {
     if (options && options.required && !val) {
         throw new Error(`Input required and not supplied: ${name}`);
     }
+    if (options && options.trimWhitespace === false) {
+        return val;
+    }
     return val.trim();
 }
 exports.getInput = getInput;
+/**
+ * Gets the input value of the boolean type in the YAML 1.2 "core schema" specification.
+ * Support boolean input list: `true | True | TRUE | false | False | FALSE` .
+ * The return value is also in boolean type.
+ * ref: https://yaml.org/spec/1.2/spec.html#id2804923
+ *
+ * @param     name     name of the input to get
+ * @param     options  optional. See InputOptions.
+ * @returns   boolean
+ */
+function getBooleanInput(name, options) {
+    const trueValue = ['true', 'True', 'TRUE'];
+    const falseValue = ['false', 'False', 'FALSE'];
+    const val = getInput(name, options);
+    if (trueValue.includes(val))
+        return true;
+    if (falseValue.includes(val))
+        return false;
+    throw new TypeError(`Input does not meet YAML 1.2 "Core Schema" specification: ${name}\n` +
+        `Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
+}
+exports.getBooleanInput = getBooleanInput;
 /**
  * Sets the value of an output.
  *
@@ -338,14 +390,27 @@ exports.getState = getState;
 
 
 // For internal use, subject to change.
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.issueCommand = void 0;
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const fs = __importStar(__nccwpck_require__(747));
@@ -375,6 +440,7 @@ exports.issueCommand = issueCommand;
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.toCommandValue = void 0;
 /**
  * Sanitizes an input into a string so it can be passed into issueCommand safely
  * @param input input to sanitize into a string
@@ -393,25 +459,194 @@ exports.toCommandValue = toCommandValue;
 
 /***/ }),
 
-/***/ 996:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ 747:
+/***/ ((module) => {
+
+module.exports = require("fs");;
+
+/***/ }),
+
+/***/ 87:
+/***/ ((module) => {
+
+module.exports = require("os");;
+
+/***/ }),
+
+/***/ 622:
+/***/ ((module) => {
+
+module.exports = require("path");;
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __nccwpck_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		var threw = true;
+/******/ 		try {
+/******/ 			__webpack_modules__[moduleId].call(module.exports, module, module.exports, __nccwpck_require__);
+/******/ 			threw = false;
+/******/ 		} finally {
+/******/ 			if(threw) delete __webpack_module_cache__[moduleId];
+/******/ 		}
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__nccwpck_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/compat */
+/******/ 	
+/******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";/************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+(() => {
+// ESM COMPAT FLAG
+__nccwpck_require__.r(__webpack_exports__);
+
+// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
+var core = __nccwpck_require__(186);
+// EXTERNAL MODULE: external "fs"
+var external_fs_ = __nccwpck_require__(747);
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(622);
+;// CONCATENATED MODULE: ./src/FileDetails.ts
+
+class FileDetails {
+    constructor(path) {
+        const result = (0,external_path_.parse)(path);
+        this.FullPath = path;
+        this.Root = result.root;
+        this.Dir = result.dir;
+        this.Base = result.base;
+        this.Name = result.name;
+        this.Ext = result.ext;
+    }
+}
+
+;// CONCATENATED MODULE: ./src/SupportedFormats.ts
+const SupportedFormats = [
+    {
+        Ext: '.md',
+        Pattern: /^(?!<!--).*\[[^[]+\]\(([^)]+)\)/gm
+    },
+    {
+        Ext: '.toml',
+        Pattern: /^(?!#).*path\s=\s"(.*)"$/gm
+    }
+];
+
+;// CONCATENATED MODULE: ./src/Config.ts
 
 
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Config = void 0;
-const fs_1 = __nccwpck_require__(747);
-const FileDetails_1 = __nccwpck_require__(8);
-const SupportedFormats_1 = __nccwpck_require__(779);
+
+
 class Config {
     constructor(source, targets, fileTypes, excludeFolders, excludeFiles) {
-        this.SupportedFormats = SupportedFormats_1.SupportedFormats;
+        this.SupportedFormats = SupportedFormats;
         // SOURCE
-        this.Source = this.SourceValidation(source);
+        if (this.IsValidRelativePath(source)) {
+            const normalizedSource = (0,external_path_.normalize)(source);
+            this.Source = normalizedSource;
+        }
+        else {
+            throw new Error(`[Config]: Source path not valid: ${source}`);
+        }
         // TARGETS
-        this.Targets = this.TargetValidation(targets);
-        this.FileTypes = fileTypes === undefined ? [] : this.FileTypeValidation(fileTypes);
-        this.ExcludeFolders = excludeFolders === undefined ? [] : this.ExcludeFoldersValidation(excludeFolders);
-        this.ExcludeFiles = excludeFiles === undefined ? [] : this.ExcludeFilesValidation(excludeFiles);
+        this.Targets = [];
+        for (const targetPath of targets) {
+            const normalizedPath = (0,external_path_.normalize)(targetPath);
+            if (this.IsValidRelativePath(normalizedPath)) {
+                const targetDetails = new FileDetails(normalizedPath);
+                const patternData = this.SupportedFormats.find(e => e.Ext === targetDetails.Ext);
+                if (patternData === undefined) {
+                    throw new Error(`[Config]: Target must be a supported document type: \n Current: ${targetDetails.Ext} | Supported: ${this.SupportedFormats.map(e => e.Ext)}`);
+                }
+                this.Targets.push({
+                    FullPath: targetDetails.FullPath,
+                    Dir: targetDetails.Dir,
+                    Base: targetDetails.Base,
+                    Name: targetDetails.Name,
+                    Ext: targetDetails.Ext,
+                    Root: targetDetails.Root,
+                    Pattern: patternData.Pattern
+                });
+            }
+            else {
+                throw new Error(`[Config]: Target path not valid: ${targetPath}`);
+            }
+        }
+        // FILE TYPES
+        this.FileTypes = [];
+        if (fileTypes !== undefined) {
+            for (const fileType of fileTypes) {
+                if (fileType === '') {
+                    throw new Error(`[Config]: Can't have an empty string as extension`);
+                }
+                else {
+                    this.FileTypes.push(fileType);
+                }
+            }
+        }
+        this.ExcludeFolders = [];
+        if (excludeFolders !== undefined) {
+            for (const excludeFolder of excludeFolders) {
+                if (excludeFolder === '') {
+                    throw new Error(`[Config]: Can't have an empty exclude folder`);
+                }
+                const normalizedFolderPath = (0,external_path_.normalize)(excludeFolder);
+                if ((0,external_path_.isAbsolute)(normalizedFolderPath)) {
+                    throw new Error(`[Config]: ExcludeFolder is not a valid relative path: ${normalizedFolderPath}`);
+                }
+                else {
+                    this.ExcludeFolders.push(normalizedFolderPath);
+                }
+            }
+        }
+        this.ExcludeFiles = [];
+        if (excludeFiles !== undefined) {
+            for (const excludeFile of excludeFiles) {
+                if (excludeFile === '') {
+                    throw new Error(`[Config]: Can't have an empty exclude file`);
+                }
+                const normalizedFile = (0,external_path_.normalize)(excludeFile);
+                if ((0,external_path_.isAbsolute)(normalizedFile)) {
+                    throw new Error(`[Config]: ExcludeFile is not a valid relative path: ${normalizedFile}`);
+                }
+                else {
+                    this.ExcludeFiles.push(normalizedFile);
+                }
+            }
+        }
     }
     /**
      * Returns the config in a prettified readable string.
@@ -423,131 +658,224 @@ class Config {
         output += `\tExcludeFolders: ${this.ExcludeFolders}\n`;
         output += `\tExcludeFiles: ${this.ExcludeFiles}\n`;
         for (const target of this.Targets) {
-            output += `\tTarget: ${target.Path} | Ext: ${target.Extension}\n`;
+            output += `\tTarget: ${target.FullPath} | Ext: ${target.Ext}\n`;
         }
         return output;
     }
-    /**
-     * Checks if the path starts with ./
-     */
-    PathStartRelative(path) {
-        const startOfLine = /^\.\//gm;
-        return startOfLine.exec(path) !== null;
-    }
-    /**
-     * Checks if the path ends with /
-     */
-    PathEndWithSlash(path) {
-        const endOfLine = /.*\/$/gm;
-        return endOfLine.exec(path) !== null;
-    }
-    PathStartWithDot(path) {
-        const dotStart = /^\./gm;
-        return dotStart.exec(path) !== null;
-    }
-    SourceValidation(path) {
-        if (path === '' || path === null || path === undefined) {
-            throw new Error('[Config]: Source path must be a valid string');
+    IsValidRelativePath(path) {
+        if ((0,external_path_.isAbsolute)(path)) {
+            throw new Error(`[Config]: Path must be relative: ${path}`);
         }
-        // must start with ./
-        if (!this.PathStartRelative(path)) {
-            throw new Error('[Config]: Source path must start with "./"');
+        if (!(0,external_fs_.existsSync)(path)) {
+            throw new Error(`[Config]: Path does not exist: ${path}`);
         }
-        // must end with /
-        if (!this.PathEndWithSlash(path)) {
-            throw new Error('[Config]: Source path must end with "/"');
-        }
-        if (!fs_1.existsSync(path)) {
-            throw new Error(`Config error: Source directory does not exist / not found`);
-        }
-        return path;
-    }
-    TargetValidation(paths) {
-        const targets = [];
-        for (const targetPath of paths) {
-            if (targetPath === '' || targetPath === null || targetPath === undefined) {
-                throw new Error(`[Config]: Target path must be a valid string: ${targetPath}`);
-            }
-            if (!this.PathStartRelative(targetPath)) {
-                throw new Error(`[Config]: Target path must start with "./": ${targetPath}`);
-            }
-            if (this.PathEndWithSlash(targetPath)) {
-                throw new Error(`[Config]: Target path must not end with "/": ${targetPath}`);
-            }
-            if (!fs_1.existsSync(targetPath)) {
-                throw new Error(`Config error: Target does not exist / not found: ${targetPath}`);
-            }
-            // Get filename / extension
-            const pathData = new FileDetails_1.FileDetails(targetPath);
-            const patternData = this.SupportedFormats.find(e => e.Extension === pathData.Extension);
-            if (patternData === undefined) {
-                console.log(this.SupportedFormats.map(e => e.Extension));
-                throw new Error(`[Config]: Target must be a supported document type: ${targetPath} | ${pathData.Extension}`);
-            }
-            targets.push({ Path: targetPath, Extension: patternData.Extension, Pattern: patternData.Pattern });
-        }
-        return targets;
-    }
-    FileTypeValidation(fileTypes) {
-        if (fileTypes === null || fileTypes === undefined) {
-            throw new Error('FileTypes must be a valid array');
-        }
-        for (const fileType of fileTypes) {
-            if (fileType === undefined || fileType === null || fileType === '') {
-                throw new Error('Filetype not a valid string');
-            }
-            if (this.PathStartWithDot(fileType)) {
-                throw new Error(`FileType ${fileType} should not start with .`);
-            }
-            if (this.PathEndWithSlash(fileType)) {
-                throw new Error(`FileType ${fileType} should not end with /`);
-            }
-        }
-        return fileTypes;
-    }
-    ExcludeFoldersValidation(folderPaths) {
-        if (folderPaths === null || folderPaths === undefined) {
-            throw new Error('ExcludeFolders must be a valid array');
-        }
-        for (const path of folderPaths) {
-            if (path === undefined || path === null || path === '') {
-                throw new Error('[Config]: ExcludeFolder path not a valid string');
-            }
-            if (!this.PathStartRelative(path)) {
-                throw new Error(`[Config]: ExcludeFolder path must start with "./": ${path}`);
-            }
-        }
-        return folderPaths;
-    }
-    ExcludeFilesValidation(filePaths) {
-        if (filePaths === null || filePaths === undefined) {
-            throw new Error('ExcludeFiles must be a valid array');
-        }
-        for (const path of filePaths) {
-            if (path === undefined || path === null || path === '') {
-                throw new Error('ExcludeFolder path not a valid string');
-            }
-            if (!this.PathStartRelative(path)) {
-                throw new Error(`[Config]: Target path must start with "./": ${path}`);
-            }
-            if (this.PathEndWithSlash(path)) {
-                throw new Error(`[Config]: Target path must not end with "/": ${path}`);
-            }
-        }
-        return filePaths;
+        return true;
     }
 }
-exports.Config = Config;
+
+;// CONCATENATED MODULE: ./src/Defaults.ts
+const defaultSource = './__tests__/data/source_data/';
+const defaultFileTypes = ['.test'];
+const defaultExcludeFiles = ['./__tests__/data/source_data/should_be_ignored.test'];
+const defaultExcludeFolders = ['./__tests__/data/source_data/ignorefolder'];
+const defaultTargets = ['./__tests__/data/ValidToml.toml', './__tests__/data/ValidReadme.md'];
+
+;// CONCATENATED MODULE: ./src/InputParser.ts
+
+function ParseInput(inputName) {
+    const input = core.getInput(inputName);
+    if (input === undefined || input === '') {
+        // core.setFailed(`Config Error: Unable to get array input ${inputName}`);
+        // console.log(`Config Error: Unable to get config input ${inputName}`); // Using defaults
+        return undefined;
+    }
+    else {
+        return input;
+    }
+}
+function ParseInputArray(inputName) {
+    let result;
+    const input = ParseInput(inputName);
+    if (input === undefined)
+        return undefined;
+    try {
+        result = JSON.parse(input);
+        return result;
+    }
+    catch (_a) {
+        core.setFailed(`Config Error: Unable to parse array input ${inputName}`);
+        return undefined;
+    }
+}
+function ParseTargets(inputName) {
+    let result;
+    const input = ParseInput(inputName);
+    if (input === undefined)
+        return undefined;
+    try {
+        result = JSON.parse(input);
+        return result;
+    }
+    catch (_a) {
+        core.setFailed(`Config Error: Unable to parse target array input ${inputName}`);
+        return undefined;
+    }
+}
+
+;// CONCATENATED MODULE: ./src/Setup.ts
 
 
-/***/ }),
 
-/***/ 252:
-/***/ ((__unused_webpack_module, exports) => {
+class Setup {
+    constructor() {
+        var _a, _b, _c, _d, _e;
+        // console.log('======= Retrieve inputs =======');
+        const source = (_a = ParseInput('source')) !== null && _a !== void 0 ? _a : defaultSource;
+        const fileTypes = (_b = ParseInputArray('file-types')) !== null && _b !== void 0 ? _b : defaultFileTypes;
+        const excludeFolders = (_c = ParseInputArray('exclude-folders')) !== null && _c !== void 0 ? _c : defaultExcludeFolders;
+        const excludeFiles = (_d = ParseInputArray('exclude-files')) !== null && _d !== void 0 ? _d : defaultExcludeFiles;
+        const targets = (_e = ParseTargets('targets')) !== null && _e !== void 0 ? _e : defaultTargets;
+        this.Config = new Config(source, targets, fileTypes, excludeFolders, excludeFiles);
+    }
+}
+
+;// CONCATENATED MODULE: ./src/InclusionController.ts
+function IncludeFile(fileDetails, config) {
+    return !ExcludeFile(fileDetails.FullPath, config.ExcludeFiles, config.ExcludeFolders) && WhitelistedType(fileDetails.Ext, config.FileTypes);
+}
+function IncludeFolder(path, config) {
+    return !ExcludeDirectory(path, config.ExcludeFolders);
+}
+function WhitelistedType(extension, types) {
+    if (types.length < 1)
+        return true;
+    return types.some(e => e === extension);
+}
+function ExcludeFile(filePath, excludeFiles, excludeDirs) {
+    const excludeByDir = excludeDirs.some(dir => filePath.includes(dir));
+    const excludeByFile = excludeFiles.some(e => e === filePath);
+    return excludeByDir || excludeByFile;
+}
+function ExcludeDirectory(dirPath, excludeDirs) {
+    return excludeDirs.some(e => e === dirPath);
+}
+
+;// CONCATENATED MODULE: ./src/DataCollection/SourceData.ts
 
 
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CrossReferencer = void 0;
+
+
+class SourceDataCollector {
+    constructor(config) {
+        this.FileDetails = this.GetSourceData(config.Source, config);
+    }
+    GetSourceData(path, config) {
+        let files = [];
+        const dirs = (0,external_fs_.readdirSync)(path, { withFileTypes: true });
+        for (const element of dirs) {
+            const elementPath = (0,external_path_.join)(path, element.name);
+            if (element.isDirectory()) {
+                if (IncludeFolder(elementPath, config)) {
+                    files = files.concat(this.GetSourceData(elementPath, config));
+                }
+            }
+            else {
+                const fileDetails = new FileDetails(elementPath);
+                // Only check files that are whitelisted and not excluded
+                if (IncludeFile(fileDetails, config)) {
+                    files.push(fileDetails);
+                }
+            }
+        }
+        return files;
+    }
+}
+
+;// CONCATENATED MODULE: ./src/IoOperations.ts
+
+function IsValidPath(path) {
+    return existsSync(path);
+}
+function ReadFileFromPath(path) {
+    if (!(0,external_fs_.existsSync)(path))
+        throw new Error('Invalid Path');
+    return (0,external_fs_.readFileSync)(path, { encoding: 'utf8' });
+}
+
+;// CONCATENATED MODULE: ./src/DataCollection/TargetData.ts
+
+
+
+
+class TargetDataCollector {
+    constructor(config) {
+        this.TargetData = [];
+        for (const target of config.Targets) {
+            const data = this.GetTargetData(target, config);
+            if (data.length >= 0) {
+                this.TargetData.push({ Target: target.FullPath, Data: data });
+            }
+        }
+    }
+    GetTargetData(target, config) {
+        // console.log(`Getting data from: ${target.Path}`);
+        const output = [];
+        // Read the contents of the file
+        const content = ReadFileFromPath(target.FullPath);
+        if (content.length <= 0)
+            return [];
+        const preProcessor = [];
+        const matches = content.matchAll(target.Pattern);
+        // Scan through the document and parse any links contained therein
+        for (const match of matches) {
+            if (match.index === undefined) {
+                throw new Error('Could not index of match. Something is wrong somewhere');
+            }
+            else {
+                preProcessor.push({ Orig: match[0], Link: match[1], Target: target, Line: GetLineNr(content, match.index) });
+            }
+        }
+        // Parse through the links
+        for (const data of preProcessor) {
+            if (this.IgnoreLink(data.Link)) {
+                continue;
+            }
+            else {
+                const rootPath = (0,external_path_.join)(data.Target.Dir, data.Link);
+                if (this.InTargetScope(rootPath, config.Source) && !ExcludeFile(rootPath, config.ExcludeFiles, config.ExcludeFolders)) {
+                    output.push({
+                        Details: new FileDetails(rootPath),
+                        RelativePath: data.Link,
+                        OriginalMatch: data.Orig,
+                        ParentFile: data.Target,
+                        LineNr: data.Line
+                    });
+                }
+            }
+        }
+        return output;
+    }
+    IgnoreLink(link) {
+        return this.WebLink(link) || this.DocLink(link);
+    }
+    InTargetScope(path, scope) {
+        return path.includes(scope);
+    }
+    WebLink(link) {
+        const webLinks = /^https*:\/\//gm;
+        return webLinks.exec(link) !== null;
+    }
+    DocLink(link) {
+        const docLink = /^#/gm;
+        return docLink.exec(link) !== null;
+    }
+}
+function GetLineNr(content, charIndex) {
+    const subString = content.substring(0, charIndex);
+    return subString.split('\n').length;
+}
+
+;// CONCATENATED MODULE: ./src/CrossReferencer.ts
 class CrossReferencer {
     constructor(sourceData, targetData) {
         this.MissingFromTargets = [];
@@ -558,7 +886,7 @@ class CrossReferencer {
             let matchesCount = 0;
             const missingFromTarget = [];
             for (const clonedTargetData of clonedTarget) {
-                const match = clonedTargetData.Data.find(e => e.Details.SourcePath === source.SourcePath);
+                const match = clonedTargetData.Data.find(e => e.Details.FullPath === source.FullPath);
                 if (match !== undefined) {
                     // Add to the match count
                     matchesCount++;
@@ -575,18 +903,18 @@ class CrossReferencer {
             }
             else if (matchesCount === 0) {
                 // not present in any targets
-                this.MissingFromTargets.push({ Path: source.SourcePath, MissingTargets: targetData.map(e => e.Target) });
+                this.MissingFromTargets.push({ Path: source.FullPath, MissingTargets: targetData.map(e => e.Target) });
             }
             else {
                 // File present in some, but not all targets
-                this.MissingFromTargets.push({ Path: source.SourcePath, MissingTargets: missingFromTarget });
+                this.MissingFromTargets.push({ Path: source.FullPath, MissingTargets: missingFromTarget });
             }
         }
         for (const target of clonedTarget) {
             for (const data of target.Data) {
                 this.MissingFromSource.push({
-                    Path: data.Details.SourcePath,
-                    InTarget: data.ParentFile.Path,
+                    Path: data.Details.FullPath,
+                    InTarget: data.ParentFile.FullPath,
                     Line: data.LineNr
                 });
             }
@@ -594,334 +922,8 @@ class CrossReferencer {
         this.HasIssues = this.MissingFromTargets.length + this.MissingFromSource.length > 0;
     }
 }
-exports.CrossReferencer = CrossReferencer;
 
-
-/***/ }),
-
-/***/ 79:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SourceDataCollector = void 0;
-const fs_1 = __nccwpck_require__(747);
-const FileDetails_1 = __nccwpck_require__(8);
-const InclusionController_1 = __nccwpck_require__(758);
-class SourceDataCollector {
-    constructor(config) {
-        this.FileDetails = this.GetSourceData(config.Source, config);
-        // console.log(`Found ${this.FileDetails.length} entries in ${config.Source}`);
-    }
-    GetSourceData(path, config) {
-        let files = [];
-        const dirs = fs_1.readdirSync(path, { withFileTypes: true });
-        for (const element of dirs) {
-            if (element.isDirectory()) {
-                if (InclusionController_1.IncludeFolder(path + element.name, config)) {
-                    files = files.concat(this.GetSourceData(`${path}${element.name}/`, config));
-                }
-                else {
-                    // console.log(`Folder excluded: ${path}${element.name}`);
-                }
-            }
-            else {
-                const fileDetails = new FileDetails_1.FileDetails(path + element.name);
-                // Only check files that are whitelisted and not excluded
-                if (InclusionController_1.IncludeFile(fileDetails, config)) {
-                    files.push(fileDetails);
-                }
-            }
-        }
-        return files;
-    }
-}
-exports.SourceDataCollector = SourceDataCollector;
-
-
-/***/ }),
-
-/***/ 416:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TargetDataCollector = void 0;
-const FileDetails_1 = __nccwpck_require__(8);
-const InclusionController_1 = __nccwpck_require__(758);
-const IoOperations_1 = __nccwpck_require__(535);
-class TargetDataCollector {
-    constructor(config) {
-        this.TargetData = [];
-        for (const target of config.Targets) {
-            const data = this.GetTargetData(target, config);
-            if (data.length >= 0) {
-                // console.log(`Found ${data.length} entries in ${target.Path}`);
-                this.TargetData.push({ Target: target.Path, Data: data });
-            }
-        }
-    }
-    GetTargetData(target, config) {
-        // console.log(`Getting data from: ${target.Path}`);
-        const output = [];
-        // Read the contents of the file
-        const content = IoOperations_1.ReadFileFromPath(target.Path);
-        if (content.length <= 0)
-            return [];
-        const preProcessor = [];
-        const matches = content.matchAll(target.Pattern);
-        for (const match of matches) {
-            if (match.index === undefined) {
-                console.warn('Could not index of match. Something is wrong somewhere');
-            }
-            else {
-                // TODO: There may be an issue with the markdown pattern, not collecting all links in document (early in document)
-                // console.log(`Orig: ${match[0]} | Link: ${match[1]}`);
-                preProcessor.push({ Orig: match[0], Link: match[1], Target: target, Line: GetLineNr(content, match.index) });
-            }
-        }
-        for (const data of preProcessor) {
-            if (!this.WebLink(data.Link) && !this.DocLink(data.Link)) {
-                const rootPath = GetRootPath(data.Target.Path, data.Link);
-                if (this.InTargetScope(rootPath, config.Source) && !InclusionController_1.ExcludeFile(rootPath, config.ExcludeFiles, config.ExcludeFolders)) {
-                    output.push({
-                        Details: new FileDetails_1.FileDetails(rootPath),
-                        RelativePath: data.Link,
-                        OriginalMatch: data.Orig,
-                        ParentFile: data.Target,
-                        LineNr: data.Line
-                    });
-                }
-            }
-        }
-        return output;
-    }
-    InTargetScope(path, scope) {
-        return path.includes(scope);
-    }
-    WebLink(link) {
-        const webLinks = /^https*:\/\//gm;
-        return webLinks.exec(link) !== null;
-    }
-    DocLink(link) {
-        const docLink = /^#/gm;
-        return docLink.exec(link) !== null;
-    }
-}
-exports.TargetDataCollector = TargetDataCollector;
-function GetLineNr(content, charIndex) {
-    const subString = content.substring(0, charIndex);
-    return subString.split('\n').length;
-}
-function GetRootPath(targetPath, filePath) {
-    // Source goes from root -> document
-    // Target goes from document -> file
-    const targetPattern = /^(.+\/)/gm;
-    const rootToTarget = Array.from(targetPath.matchAll(targetPattern))[0][1];
-    // If prefixed with './' remove it.
-    const filePattern = /^(.\/)*(.*)$/gm;
-    const TargetToFile = Array.from(filePath.matchAll(filePattern))[0][2];
-    return `${rootToTarget}${TargetToFile}`;
-}
-
-
-/***/ }),
-
-/***/ 605:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.defaultTargets = exports.defaultExcludeFolders = exports.defaultExcludeFiles = exports.defaultFileTypes = exports.defaultSource = void 0;
-exports.defaultSource = './__tests__/data/source_data/';
-exports.defaultFileTypes = ['test'];
-exports.defaultExcludeFiles = ['./__tests__/data/source_data/should_be_ignored.test'];
-exports.defaultExcludeFolders = ['./__tests__/data/source_data/ignorefolder'];
-exports.defaultTargets = ['./__tests__/data/ValidToml.toml', './__tests__/data/ValidReadme.md'];
-
-
-/***/ }),
-
-/***/ 8:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.FileDetails = void 0;
-class FileDetails {
-    constructor(path) {
-        this.SourcePath = path;
-        this.FileName = this.GetFileName(path);
-        this.Extension = this.GetFileExtension(path);
-        this.Path = this.GetPathToFile(path);
-    }
-    GetPathToFile(path) {
-        /* eslint-disable no-useless-escape */
-        const regex = /^(.+\/)*([^\/]+)*$/gm;
-        /* eslint-enable no-useless-escape */
-        const result = regex.exec(path);
-        if (result !== null && result !== undefined && result.length > 0) {
-            return result[1];
-        }
-        return '';
-    }
-    GetFileName(path) {
-        /* eslint-disable no-useless-escape */
-        const regex = /^(.+\/)*([^\/]+)*$/gm;
-        /* eslint-enable no-useless-escape */
-        const result = regex.exec(path);
-        if (result !== null && result !== undefined && result.length > 0) {
-            return result[2];
-        }
-        return '';
-    }
-    GetFileExtension(path) {
-        const regex = /(?:\.([^.]+))?$/; // Capture file extensions
-        const result = regex.exec(path);
-        if (result !== null && result !== undefined && result.length > 0) {
-            return result[1];
-        }
-        else {
-            return '';
-        }
-    }
-}
-exports.FileDetails = FileDetails;
-
-
-/***/ }),
-
-/***/ 758:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ExcludeFile = exports.IncludeFolder = exports.IncludeFile = void 0;
-function IncludeFile(fileDetails, config) {
-    return !ExcludeFile(fileDetails.SourcePath, config.ExcludeFiles, config.ExcludeFolders) && WhitelistedType(fileDetails.Extension, config.FileTypes);
-}
-exports.IncludeFile = IncludeFile;
-function IncludeFolder(path, config) {
-    return !ExcludeDirectory(path, config.ExcludeFolders);
-}
-exports.IncludeFolder = IncludeFolder;
-function WhitelistedType(extension, types) {
-    if (types.length < 1)
-        return true;
-    return types.some(e => e === extension);
-}
-function ExcludeFile(filePath, excludeFiles, excludeDirs) {
-    const excludeByDir = excludeDirs.some(dir => filePath.includes(dir));
-    const excludeByFile = excludeFiles.some(e => e === filePath);
-    return excludeByDir || excludeByFile;
-}
-exports.ExcludeFile = ExcludeFile;
-function ExcludeDirectory(dirPath, excludeDirs) {
-    return excludeDirs.some(e => e === dirPath);
-}
-
-
-/***/ }),
-
-/***/ 69:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ParseTargets = exports.ParseInputArray = exports.ParseInput = void 0;
-const core = __importStar(__nccwpck_require__(186));
-function ParseInput(inputName) {
-    const input = core.getInput(inputName);
-    if (input === undefined || input === '') {
-        // core.setFailed(`Config Error: Unable to get array input ${inputName}`);
-        // console.log(`Config Error: Unable to get config input ${inputName}`); // Using defaults
-        return undefined;
-    }
-    else {
-        return input;
-    }
-}
-exports.ParseInput = ParseInput;
-function ParseInputArray(inputName) {
-    let result;
-    const input = ParseInput(inputName);
-    if (input === undefined)
-        return undefined;
-    try {
-        result = JSON.parse(input);
-        return result;
-    }
-    catch (_a) {
-        core.setFailed(`Config Error: Unable to parse array input ${inputName}`);
-        return undefined;
-    }
-}
-exports.ParseInputArray = ParseInputArray;
-function ParseTargets(inputName) {
-    let result;
-    const input = ParseInput(inputName);
-    if (input === undefined)
-        return undefined;
-    try {
-        result = JSON.parse(input);
-        return result;
-    }
-    catch (_a) {
-        core.setFailed(`Config Error: Unable to parse target array input ${inputName}`);
-        return undefined;
-    }
-}
-exports.ParseTargets = ParseTargets;
-
-
-/***/ }),
-
-/***/ 535:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ReadFileFromPath = exports.IsValidPath = void 0;
-const fs_1 = __nccwpck_require__(747);
-function IsValidPath(path) {
-    return fs_1.existsSync(path);
-}
-exports.IsValidPath = IsValidPath;
-function ReadFileFromPath(path) {
-    if (!fs_1.existsSync(path))
-        throw new Error('Invalid Path');
-    return fs_1.readFileSync(path, { encoding: 'utf8' });
-}
-exports.ReadFileFromPath = ReadFileFromPath;
-
-
-/***/ }),
-
-/***/ 686:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.IssueLogger = void 0;
+;// CONCATENATED MODULE: ./src/IssueLogger.ts
 class IssueLogger {
     constructor(sourceIssues, targetIssues) {
         this.issueIter = 1;
@@ -960,35 +962,9 @@ class IssueLogger {
         return `[${this.issueIter++}/${this.IssueCount}] =>`;
     }
 }
-exports.IssueLogger = IssueLogger;
 
-
-/***/ }),
-
-/***/ 979:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+;// CONCATENATED MODULE: ./src/Main.ts
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -997,35 +973,34 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", ({ value: true }));
 // eslint:disable: no-console
-const core = __importStar(__nccwpck_require__(186));
+
 // const github = require('@actions/github');
-const Setup_1 = __nccwpck_require__(490);
-const SourceData_1 = __nccwpck_require__(79);
-const TargetData_1 = __nccwpck_require__(416);
-const CrossReferencer_1 = __nccwpck_require__(252);
-const IssueLogger_1 = __nccwpck_require__(686);
+
+
+
+
+
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             console.log('======= Running internal link consistency check =======');
-            const config = new Setup_1.Setup().Config;
+            const config = new Setup().Config;
             console.log(`Running job with config: \n${config.ToString()}`);
             // console.log('======= Getting source data =======');
-            const sourceData = new SourceData_1.SourceDataCollector(config).FileDetails;
+            const sourceData = new SourceDataCollector(config).FileDetails;
             if (sourceData.length <= 0) {
                 core.setFailed('Found no entries in source');
             }
             // console.log('======= Getting target data =======');
-            const targetData = new TargetData_1.TargetDataCollector(config).TargetData;
+            const targetData = new TargetDataCollector(config).TargetData;
             if (targetData.length <= 0) {
                 core.setFailed('Found no entries in target(s)');
             }
             // console.log('======= Cross referencing issues =======');
-            const crossChecker = new CrossReferencer_1.CrossReferencer(sourceData, targetData);
+            const crossChecker = new CrossReferencer(sourceData, targetData);
             if (crossChecker.HasIssues) {
-                const output = new IssueLogger_1.IssueLogger(crossChecker.MissingFromTargets, crossChecker.MissingFromSource);
+                const output = new IssueLogger(crossChecker.MissingFromTargets, crossChecker.MissingFromSource);
                 // core.setOutput('SourceIssues', output.SourceIssueOutput);
                 output.PrintIssues();
                 core.setFailed('✗ Cross referencing found issues, see output log to fix them');
@@ -1042,115 +1017,9 @@ function run() {
 // eslint:enable: no-console
 run();
 
+})();
 
-/***/ }),
-
-/***/ 490:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Setup = void 0;
-const Config_1 = __nccwpck_require__(996);
-const Defaults_1 = __nccwpck_require__(605);
-const InputParser_1 = __nccwpck_require__(69);
-class Setup {
-    constructor() {
-        var _a, _b, _c, _d, _e;
-        // console.log('======= Retrieve inputs =======');
-        const source = (_a = InputParser_1.ParseInput('source')) !== null && _a !== void 0 ? _a : Defaults_1.defaultSource;
-        const fileTypes = (_b = InputParser_1.ParseInputArray('file-types')) !== null && _b !== void 0 ? _b : Defaults_1.defaultFileTypes;
-        const excludeFolders = (_c = InputParser_1.ParseInputArray('exclude-folders')) !== null && _c !== void 0 ? _c : Defaults_1.defaultExcludeFolders;
-        const excludeFiles = (_d = InputParser_1.ParseInputArray('exclude-files')) !== null && _d !== void 0 ? _d : Defaults_1.defaultExcludeFiles;
-        const targets = (_e = InputParser_1.ParseTargets('targets')) !== null && _e !== void 0 ? _e : Defaults_1.defaultTargets;
-        this.Config = new Config_1.Config(source, targets, fileTypes, excludeFolders, excludeFiles);
-    }
-}
-exports.Setup = Setup;
-
-
-/***/ }),
-
-/***/ 779:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SupportedFormats = void 0;
-exports.SupportedFormats = [
-    {
-        Extension: 'md',
-        Pattern: /^(?!<!--).*\[[^[]+\]\(([^)]+)\)/gm
-    },
-    {
-        Extension: 'toml',
-        Pattern: /^(?!#).*path\s=\s"(.*)"$/gm
-    }
-];
-
-
-/***/ }),
-
-/***/ 747:
-/***/ ((module) => {
-
-module.exports = require("fs");;
-
-/***/ }),
-
-/***/ 87:
-/***/ ((module) => {
-
-module.exports = require("os");;
-
-/***/ }),
-
-/***/ 622:
-/***/ ((module) => {
-
-module.exports = require("path");;
-
-/***/ })
-
-/******/ 	});
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __nccwpck_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		if(__webpack_module_cache__[moduleId]) {
-/******/ 			return __webpack_module_cache__[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		var threw = true;
-/******/ 		try {
-/******/ 			__webpack_modules__[moduleId].call(module.exports, module, module.exports, __nccwpck_require__);
-/******/ 			threw = false;
-/******/ 		} finally {
-/******/ 			if(threw) delete __webpack_module_cache__[moduleId];
-/******/ 		}
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-/******/ 	/* webpack/runtime/compat */
-/******/ 	
-/******/ 	__nccwpck_require__.ab = __dirname + "/";/************************************************************************/
-/******/ 	// module exports must be returned from runtime so entry inlining is disabled
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	return __nccwpck_require__(979);
+module.exports = __webpack_exports__;
 /******/ })()
 ;
 //# sourceMappingURL=index.js.map

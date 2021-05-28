@@ -2,7 +2,7 @@ import { Config } from './Config';
 import { FileDetails } from './FileDetails';
 
 export function IncludeFile(fileDetails: FileDetails, config: Config): boolean {
-    return !ExcludeFile(fileDetails.SourcePath, config.ExcludeFiles, config.ExcludeFolders) && WhitelistedType(fileDetails.Extension, config.FileTypes);
+    return !ExcludeFile(fileDetails.FullPath, config.ExcludeFiles, config.ExcludeFolders) && WhitelistedType(fileDetails.Ext, config.FileTypes);
 }
 
 export function IncludeFolder(path: string, config: Config): boolean {
@@ -11,7 +11,6 @@ export function IncludeFolder(path: string, config: Config): boolean {
 
 function WhitelistedType(extension: string, types: string[]): boolean {
     if (types.length < 1) return true;
-
     return types.some(e => e === extension);
 }
 

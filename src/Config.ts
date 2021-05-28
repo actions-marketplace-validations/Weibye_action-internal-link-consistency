@@ -1,29 +1,97 @@
-import { existsSync, readFileSync } from 'fs';
+import { existsSync } from 'fs';
+import { isAbsolute, normalize } from 'path';
 import { FileDetails } from './FileDetails';
-import { ITarget, IRegFormat } from './Interfaces';
+import { ITarget, IFileDetails, ISupportedFormat } from './Interfaces';
 import { SupportedFormats } from './SupportedFormats';
 
 export class Config {
     public Source: string;
+    public Targets: ITarget[];
 
     public FileTypes: string[];
-    public SupportedFormats: IRegFormat[];
+    public SupportedFormats: ISupportedFormat[];
 
     public ExcludeFolders: string[];
     public ExcludeFiles: string[];
-    public Targets: ITarget[];
 
     public constructor(source: string, targets: string[], fileTypes?: string[], excludeFolders?: string[], excludeFiles?: string[]) {
         this.SupportedFormats = SupportedFormats;
 
         // SOURCE
-        this.Source = this.SourceValidation(source);
-        // TARGETS
-        this.Targets = this.TargetValidation(targets);
+        if (this.IsValidRelativePath(source)) {
+            const normalizedSource = normalize(source);
+            this.Source = normalizedSource;
+        } else {
+            throw new Error(`[Config]: Source path not valid: ${source}`);
+        }
 
-        this.FileTypes = fileTypes === undefined ? [] : this.FileTypeValidation(fileTypes);
-        this.ExcludeFolders = excludeFolders === undefined ? [] : this.ExcludeFoldersValidation(excludeFolders);
-        this.ExcludeFiles = excludeFiles === undefined ? [] : this.ExcludeFilesValidation(excludeFiles);
+        // TARGETS
+        this.Targets = [];
+        for (const targetPath of targets) {
+            const normalizedPath = normalize(targetPath);
+            if (this.IsValidRelativePath(normalizedPath)) {
+                const targetDetails: IFileDetails = new FileDetails(normalizedPath);
+                const patternData: ISupportedFormat | undefined = this.SupportedFormats.find(e => e.Ext === targetDetails.Ext);
+
+                if (patternData === undefined) {
+                    throw new Error(`[Config]: Target must be a supported document type: \n Current: ${targetDetails.Ext} | Supported: ${this.SupportedFormats.map(e => e.Ext)}`);
+                }
+                this.Targets.push({
+                    FullPath: targetDetails.FullPath,
+                    Dir: targetDetails.Dir,
+                    Base: targetDetails.Base,
+                    Name: targetDetails.Name,
+                    Ext: targetDetails.Ext,
+                    Root: targetDetails.Root,
+                    Pattern: patternData.Pattern
+                });
+            } else {
+                throw new Error(`[Config]: Target path not valid: ${targetPath}`);
+            }
+        }
+
+        // FILE TYPES
+        this.FileTypes = [];
+        if (fileTypes !== undefined) {
+            for (const fileType of fileTypes) {
+                if (fileType === '') {
+                    throw new Error(`[Config]: Can't have an empty string as extension`);
+                } else {
+                    this.FileTypes.push(fileType);
+                }
+            }
+        }
+
+        this.ExcludeFolders = [];
+        if (excludeFolders !== undefined) {
+            for (const excludeFolder of excludeFolders) {
+                if (excludeFolder === '') {
+                    throw new Error(`[Config]: Can't have an empty exclude folder`);
+                }
+                const normalizedFolderPath = normalize(excludeFolder);
+
+                if (isAbsolute(normalizedFolderPath)) {
+                    throw new Error(`[Config]: ExcludeFolder is not a valid relative path: ${normalizedFolderPath}`);
+                } else {
+                    this.ExcludeFolders.push(normalizedFolderPath);
+                }
+            }
+        }
+
+        this.ExcludeFiles = [];
+        if (excludeFiles !== undefined) {
+            for (const excludeFile of excludeFiles) {
+                if (excludeFile === '') {
+                    throw new Error(`[Config]: Can't have an empty exclude file`);
+                }
+                const normalizedFile = normalize(excludeFile);
+                if (isAbsolute(normalizedFile)) {
+                    throw new Error(`[Config]: ExcludeFile is not a valid relative path: ${normalizedFile}`);
+                } else {
+                    this.ExcludeFiles.push(normalizedFile);
+                }
+            }
+        }
     }
 
     /**
@@ -36,127 +104,19 @@ export class Config {
         output += `\tExcludeFolders: ${this.ExcludeFolders}\n`;
         output += `\tExcludeFiles: ${this.ExcludeFiles}\n`;
         for (const target of this.Targets) {
-            output += `\tTarget: ${target.Path} | Ext: ${target.Extension}\n`;
+            output += `\tTarget: ${target.FullPath} | Ext: ${target.Ext}\n`;
         }
         return output;
     }
 
-    /**
-     * Checks if the path starts with ./
-     */
-    private PathStartRelative(path: string): boolean {
-        const startOfLine = /^\.\//gm;
-        return startOfLine.exec(path) !== null;
-    }
-
-    /**
-     * Checks if the path ends with /
-     */
-    private PathEndWithSlash(path: string): boolean {
-        const endOfLine = /.*\/$/gm;
-        return endOfLine.exec(path) !== null;
-    }
-
-    private PathStartWithDot(path: string): boolean {
-        const dotStart = /^\./gm;
-        return dotStart.exec(path) !== null;
-    }
-
-    private SourceValidation(path: string): string {
-        if (path === '' || path === null || path === undefined) {
-            throw new Error('[Config]: Source path must be a valid string');
-        }
-        // must start with ./
-        if (!this.PathStartRelative(path)) {
-            throw new Error('[Config]: Source path must start with "./"');
-        }
-        // must end with /
-        if (!this.PathEndWithSlash(path)) {
-            throw new Error('[Config]: Source path must end with "/"');
+    private IsValidRelativePath(path: string): boolean {
+        if (isAbsolute(path)) {
+            throw new Error(`[Config]: Path must be relative: ${path}`);
         }
 
         if (!existsSync(path)) {
-            throw new Error(`Config error: Source directory does not exist / not found`);
+            throw new Error(`[Config]: Path does not exist: ${path}`);
         }
-
-        return path;
-    }
-
-    private TargetValidation(paths: string[]): ITarget[] {
-        const targets: ITarget[] = [];
-        for (const targetPath of paths) {
-            if (targetPath === '' || targetPath === null || targetPath === undefined) {
-                throw new Error(`[Config]: Target path must be a valid string: ${targetPath}`);
-            }
-            if (!this.PathStartRelative(targetPath)) {
-                throw new Error(`[Config]: Target path must start with "./": ${targetPath}`);
-            }
-            if (this.PathEndWithSlash(targetPath)) {
-                throw new Error(`[Config]: Target path must not end with "/": ${targetPath}`);
-            }
-            if (!existsSync(targetPath)) {
-                throw new Error(`Config error: Target does not exist / not found: ${targetPath}`);
-            }
-            // Get filename / extension
-            const pathData = new FileDetails(targetPath);
-            const patternData = this.SupportedFormats.find(e => e.Extension === pathData.Extension);
-            if (patternData === undefined) {
-                console.log(this.SupportedFormats.map(e => e.Extension));
-                throw new Error(`[Config]: Target must be a supported document type: ${targetPath} | ${pathData.Extension}`);
-            }
-            targets.push({ Path: targetPath, Extension: patternData.Extension, Pattern: patternData.Pattern });
-        }
-        return targets;
-    }
-
-    private FileTypeValidation(fileTypes: string[]): string[] {
-        if (fileTypes === null || fileTypes === undefined) {
-            throw new Error('FileTypes must be a valid array');
-        }
-
-        for (const fileType of fileTypes) {
-            if (fileType === undefined || fileType === null || fileType === '') {
-                throw new Error('Filetype not a valid string');
-            }
-            if (this.PathStartWithDot(fileType)) {
-                throw new Error(`FileType ${fileType} should not start with .`);
-            }
-            if (this.PathEndWithSlash(fileType)) {
-                throw new Error(`FileType ${fileType} should not end with /`);
-            }
-        }
-        return fileTypes;
-    }
-
-    private ExcludeFoldersValidation(folderPaths: string[]): string[] {
-        if (folderPaths === null || folderPaths === undefined) {
-            throw new Error('ExcludeFolders must be a valid array');
-        }
-        for (const path of folderPaths) {
-            if (path === undefined || path === null || path === '') {
-                throw new Error('[Config]: ExcludeFolder path not a valid string');
-            }
-            if (!this.PathStartRelative(path)) {
-                throw new Error(`[Config]: ExcludeFolder path must start with "./": ${path}`);
-            }
-        }
-        return folderPaths;
-    }
-    private ExcludeFilesValidation(filePaths: string[]): string[] {
-        if (filePaths === null || filePaths === undefined) {
-            throw new Error('ExcludeFiles must be a valid array');
-        }
-        for (const path of filePaths) {
-            if (path === undefined || path === null || path === '') {
-                throw new Error('ExcludeFolder path not a valid string');
-            }
-            if (!this.PathStartRelative(path)) {
-                throw new Error(`[Config]: Target path must start with "./": ${path}`);
-            }
-            if (this.PathEndWithSlash(path)) {
-                throw new Error(`[Config]: Target path must not end with "/": ${path}`);
-            }
-        }
-        return filePaths;
+        return true;
     }
 }
