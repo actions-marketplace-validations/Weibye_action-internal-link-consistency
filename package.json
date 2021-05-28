@@ -19,12 +19,12 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Weibye/example_checker.git"
+        "url": "git+https://github.com/Weibye/action-internal-link-consistency.git"
     },
     "bugs": {
-        "url": "https://github.com/Weibye/example_checker/issues"
+        "url": "https://github.com/Weibye/action-internal-link-consistency//issues"
     },
-    "homepage": "https://github.com/Weibye/example_checker#readme",
+    "homepage": "https://github.com/Weibye/action-internal-link-consistency/#readme",
     "keywords": [
         "actions",
         "node",
