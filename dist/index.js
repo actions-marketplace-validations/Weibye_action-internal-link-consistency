@@ -400,18 +400,86 @@ exports.toCommandValue = toCommandValue;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Config = void 0;
 const fs_1 = __nccwpck_require__(747);
+const path_1 = __nccwpck_require__(622);
 const FileDetails_1 = __nccwpck_require__(8);
 const SupportedFormats_1 = __nccwpck_require__(779);
 class Config {
     constructor(source, targets, fileTypes, excludeFolders, excludeFiles) {
         this.SupportedFormats = SupportedFormats_1.SupportedFormats;
         // SOURCE
-        this.Source = this.SourceValidation(source);
+        if (this.IsValidRelativePath(source)) {
+            const normalizedSource = path_1.normalize(source);
+            this.Source = normalizedSource;
+        }
+        else {
+            throw new Error(`[Config]: Source path not valid: ${source}`);
+        }
         // TARGETS
-        this.Targets = this.TargetValidation(targets);
-        this.FileTypes = fileTypes === undefined ? [] : this.FileTypeValidation(fileTypes);
-        this.ExcludeFolders = excludeFolders === undefined ? [] : this.ExcludeFoldersValidation(excludeFolders);
-        this.ExcludeFiles = excludeFiles === undefined ? [] : this.ExcludeFilesValidation(excludeFiles);
+        this.Targets = [];
+        for (const targetPath of targets) {
+            const normalizedPath = path_1.normalize(targetPath);
+            if (this.IsValidRelativePath(normalizedPath)) {
+                const targetDetails = new FileDetails_1.FileDetails(normalizedPath);
+                const patternData = this.SupportedFormats.find(e => e.Ext === targetDetails.Ext);
+                if (patternData === undefined) {
+                    throw new Error(`[Config]: Target must be a supported document type: \n Current: ${targetDetails.Ext} | Supported: ${this.SupportedFormats.map(e => e.Ext)}`);
+                }
+                this.Targets.push({
+                    FullPath: targetDetails.FullPath,
+                    Dir: targetDetails.Dir,
+                    Base: targetDetails.Base,
+                    Name: targetDetails.Name,
+                    Ext: targetDetails.Ext,
+                    Root: targetDetails.Root,
+                    Pattern: patternData.Pattern
+                });
+            }
+            else {
+                throw new Error(`[Config]: Target path not valid: ${targetPath}`);
+            }
+        }
+        // FILE TYPES
+        this.FileTypes = [];
+        if (fileTypes !== undefined) {
+            for (const fileType of fileTypes) {
+                if (fileType === '') {
+                    throw new Error(`[Config]: Can't have an empty string as extension`);
+                }
+                else {
+                    this.FileTypes.push(fileType);
+                }
+            }
+        }
+        this.ExcludeFolders = [];
+        if (excludeFolders !== undefined) {
+            for (const excludeFolder of excludeFolders) {
+                if (excludeFolder === '') {
+                    throw new Error(`[Config]: Can't have an empty exclude folder`);
+                }
+                const normalizedFolderPath = path_1.normalize(excludeFolder);
+                if (path_1.isAbsolute(normalizedFolderPath)) {
+                    throw new Error(`[Config]: ExcludeFolder is not a valid relative path: ${normalizedFolderPath}`);
+                }
+                else {
+                    this.ExcludeFolders.push(normalizedFolderPath);
+                }
+            }
+        }
+        this.ExcludeFiles = [];
+        if (excludeFiles !== undefined) {
+            for (const excludeFile of excludeFiles) {
+                if (excludeFile === '') {
+                    throw new Error(`[Config]: Can't have an empty exclude file`);
+                }
+                const normalizedFile = path_1.normalize(excludeFile);
+                if (path_1.isAbsolute(normalizedFile)) {
+                    throw new Error(`[Config]: ExcludeFile is not a valid relative path: ${normalizedFile}`);
+                }
+                else {
+                    this.ExcludeFiles.push(normalizedFile);
+                }
+            }
+        }
     }
     /**
      * Returns the config in a prettified readable string.
@@ -423,118 +491,18 @@ class Config {
         output += `\tExcludeFolders: ${this.ExcludeFolders}\n`;
         output += `\tExcludeFiles: ${this.ExcludeFiles}\n`;
         for (const target of this.Targets) {
-            output += `\tTarget: ${target.Path} | Ext: ${target.Extension}\n`;
+            output += `\tTarget: ${target.FullPath} | Ext: ${target.Ext}\n`;
         }
         return output;
     }
-    /**
-     * Checks if the path starts with ./
-     */
-    PathStartRelative(path) {
-        const startOfLine = /^\.\//gm;
-        return startOfLine.exec(path) !== null;
-    }
-    /**
-     * Checks if the path ends with /
-     */
-    PathEndWithSlash(path) {
-        const endOfLine = /.*\/$/gm;
-        return endOfLine.exec(path) !== null;
-    }
-    PathStartWithDot(path) {
-        const dotStart = /^\./gm;
-        return dotStart.exec(path) !== null;
-    }
-    SourceValidation(path) {
-        if (path === '' || path === null || path === undefined) {
-            throw new Error('[Config]: Source path must be a valid string');
-        }
-        // must start with ./
-        if (!this.PathStartRelative(path)) {
-            throw new Error('[Config]: Source path must start with "./"');
-        }
-        // must end with /
-        if (!this.PathEndWithSlash(path)) {
-            throw new Error('[Config]: Source path must end with "/"');
+    IsValidRelativePath(path) {
+        if (path_1.isAbsolute(path)) {
+            throw new Error(`[Config]: Path must be relative: ${path}`);
         }
         if (!fs_1.existsSync(path)) {
-            throw new Error(`Config error: Source directory does not exist / not found`);
+            throw new Error(`[Config]: Path does not exist: ${path}`);
         }
-        return path;
-    }
-    TargetValidation(paths) {
-        const targets = [];
-        for (const targetPath of paths) {
-            if (targetPath === '' || targetPath === null || targetPath === undefined) {
-                throw new Error(`[Config]: Target path must be a valid string: ${targetPath}`);
-            }
-            if (!this.PathStartRelative(targetPath)) {
-                throw new Error(`[Config]: Target path must start with "./": ${targetPath}`);
-            }
-            if (this.PathEndWithSlash(targetPath)) {
-                throw new Error(`[Config]: Target path must not end with "/": ${targetPath}`);
-            }
-            if (!fs_1.existsSync(targetPath)) {
-                throw new Error(`Config error: Target does not exist / not found: ${targetPath}`);
-            }
-            // Get filename / extension
-            const pathData = new FileDetails_1.FileDetails(targetPath);
-            const patternData = this.SupportedFormats.find(e => e.Extension === pathData.Extension);
-            if (patternData === undefined) {
-                console.log(this.SupportedFormats.map(e => e.Extension));
-                throw new Error(`[Config]: Target must be a supported document type: ${targetPath} | ${pathData.Extension}`);
-            }
-            targets.push({ Path: targetPath, Extension: patternData.Extension, Pattern: patternData.Pattern });
-        }
-        return targets;
-    }
-    FileTypeValidation(fileTypes) {
-        if (fileTypes === null || fileTypes === undefined) {
-            throw new Error('FileTypes must be a valid array');
-        }
-        for (const fileType of fileTypes) {
-            if (fileType === undefined || fileType === null || fileType === '') {
-                throw new Error('Filetype not a valid string');
-            }
-            if (this.PathStartWithDot(fileType)) {
-                throw new Error(`FileType ${fileType} should not start with .`);
-            }
-            if (this.PathEndWithSlash(fileType)) {
-                throw new Error(`FileType ${fileType} should not end with /`);
-            }
-        }
-        return fileTypes;
-    }
-    ExcludeFoldersValidation(folderPaths) {
-        if (folderPaths === null || folderPaths === undefined) {
-            throw new Error('ExcludeFolders must be a valid array');
-        }
-        for (const path of folderPaths) {
-            if (path === undefined || path === null || path === '') {
-                throw new Error('[Config]: ExcludeFolder path not a valid string');
-            }
-            if (!this.PathStartRelative(path)) {
-                throw new Error(`[Config]: ExcludeFolder path must start with "./": ${path}`);
-            }
-        }
-        return folderPaths;
-    }
-    ExcludeFilesValidation(filePaths) {
-        if (filePaths === null || filePaths === undefined) {
-            throw new Error('ExcludeFiles must be a valid array');
-        }
-        for (const path of filePaths) {
-            if (path === undefined || path === null || path === '') {
-                throw new Error('ExcludeFolder path not a valid string');
-            }
-            if (!this.PathStartRelative(path)) {
-                throw new Error(`[Config]: Target path must start with "./": ${path}`);
-            }
-            if (this.PathEndWithSlash(path)) {
-                throw new Error(`[Config]: Target path must not end with "/": ${path}`);
-            }
-        }
-        return filePaths;
+        return true;
     }
 }
 exports.Config = Config;
@@ -558,7 +526,7 @@ class CrossReferencer {
             let matchesCount = 0;
             const missingFromTarget = [];
             for (const clonedTargetData of clonedTarget) {
-                const match = clonedTargetData.Data.find(e => e.Details.SourcePath === source.SourcePath);
+                const match = clonedTargetData.Data.find(e => e.Details.FullPath === source.FullPath);
                 if (match !== undefined) {
                     // Add to the match count
                     matchesCount++;
@@ -575,18 +543,18 @@ class CrossReferencer {
             }
             else if (matchesCount === 0) {
                 // not present in any targets
-                this.MissingFromTargets.push({ Path: source.SourcePath, MissingTargets: targetData.map(e => e.Target) });
+                this.MissingFromTargets.push({ Path: source.FullPath, MissingTargets: targetData.map(e => e.Target) });
             }
             else {
                 // File present in some, but not all targets
-                this.MissingFromTargets.push({ Path: source.SourcePath, MissingTargets: missingFromTarget });
+                this.MissingFromTargets.push({ Path: source.FullPath, MissingTargets: missingFromTarget });
             }
         }
         for (const target of clonedTarget) {
             for (const data of target.Data) {
                 this.MissingFromSource.push({
-                    Path: data.Details.SourcePath,
-                    InTarget: data.ParentFile.Path,
+                    Path: data.Details.FullPath,
+                    InTarget: data.ParentFile.FullPath,
                     Line: data.LineNr
                 });
             }
@@ -606,27 +574,25 @@ exports.CrossReferencer = CrossReferencer;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.SourceDataCollector = void 0;
 const fs_1 = __nccwpck_require__(747);
+const path_1 = __nccwpck_require__(622);
 const FileDetails_1 = __nccwpck_require__(8);
 const InclusionController_1 = __nccwpck_require__(758);
 class SourceDataCollector {
     constructor(config) {
         this.FileDetails = this.GetSourceData(config.Source, config);
-        // console.log(`Found ${this.FileDetails.length} entries in ${config.Source}`);
     }
     GetSourceData(path, config) {
         let files = [];
         const dirs = fs_1.readdirSync(path, { withFileTypes: true });
         for (const element of dirs) {
+            const elementPath = path_1.join(path, element.name);
             if (element.isDirectory()) {
-                if (InclusionController_1.IncludeFolder(path + element.name, config)) {
-                    files = files.concat(this.GetSourceData(`${path}${element.name}/`, config));
-                }
-                else {
-                    // console.log(`Folder excluded: ${path}${element.name}`);
+                if (InclusionController_1.IncludeFolder(elementPath, config)) {
+                    files = files.concat(this.GetSourceData(elementPath, config));
                 }
             }
             else {
-                const fileDetails = new FileDetails_1.FileDetails(path + element.name);
+                const fileDetails = new FileDetails_1.FileDetails(elementPath);
                 // Only check files that are whitelisted and not excluded
                 if (InclusionController_1.IncludeFile(fileDetails, config)) {
                     files.push(fileDetails);
@@ -647,6 +613,7 @@ exports.SourceDataCollector = SourceDataCollector;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TargetDataCollector = void 0;
+const path_1 = __nccwpck_require__(622);
 const FileDetails_1 = __nccwpck_require__(8);
 const InclusionController_1 = __nccwpck_require__(758);
 const IoOperations_1 = __nccwpck_require__(535);
@@ -656,8 +623,7 @@ class TargetDataCollector {
         for (const target of config.Targets) {
             const data = this.GetTargetData(target, config);
             if (data.length >= 0) {
-                // console.log(`Found ${data.length} entries in ${target.Path}`);
-                this.TargetData.push({ Target: target.Path, Data: data });
+                this.TargetData.push({ Target: target.FullPath, Data: data });
             }
         }
     }
@@ -665,24 +631,27 @@ class TargetDataCollector {
         // console.log(`Getting data from: ${target.Path}`);
         const output = [];
         // Read the contents of the file
-        const content = IoOperations_1.ReadFileFromPath(target.Path);
+        const content = IoOperations_1.ReadFileFromPath(target.FullPath);
         if (content.length <= 0)
             return [];
         const preProcessor = [];
         const matches = content.matchAll(target.Pattern);
+        // Scan through the document and parse any links contained therein
         for (const match of matches) {
             if (match.index === undefined) {
-                console.warn('Could not index of match. Something is wrong somewhere');
+                throw new Error('Could not index of match. Something is wrong somewhere');
             }
             else {
-                // TODO: There may be an issue with the markdown pattern, not collecting all links in document (early in document)
-                // console.log(`Orig: ${match[0]} | Link: ${match[1]}`);
                 preProcessor.push({ Orig: match[0], Link: match[1], Target: target, Line: GetLineNr(content, match.index) });
             }
         }
+        // Parse through the links
         for (const data of preProcessor) {
-            if (!this.WebLink(data.Link) && !this.DocLink(data.Link)) {
-                const rootPath = GetRootPath(data.Target.Path, data.Link);
+            if (this.IgnoreLink(data.Link)) {
+                continue;
+            }
+            else {
+                const rootPath = path_1.join(data.Target.Dir, data.Link);
                 if (this.InTargetScope(rootPath, config.Source) && !InclusionController_1.ExcludeFile(rootPath, config.ExcludeFiles, config.ExcludeFolders)) {
                     output.push({
                         Details: new FileDetails_1.FileDetails(rootPath),
@@ -695,6 +664,9 @@ class TargetDataCollector {
             }
         }
         return output;
+    }
+    IgnoreLink(link) {
+        return this.WebLink(link) || this.DocLink(link);
     }
     InTargetScope(path, scope) {
         return path.includes(scope);
@@ -713,16 +685,6 @@ function GetLineNr(content, charIndex) {
     const subString = content.substring(0, charIndex);
     return subString.split('\n').length;
 }
-function GetRootPath(targetPath, filePath) {
-    // Source goes from root -> document
-    // Target goes from document -> file
-    const targetPattern = /^(.+\/)/gm;
-    const rootToTarget = Array.from(targetPath.matchAll(targetPattern))[0][1];
-    // If prefixed with './' remove it.
-    const filePattern = /^(.\/)*(.*)$/gm;
-    const TargetToFile = Array.from(filePath.matchAll(filePattern))[0][2];
-    return `${rootToTarget}${TargetToFile}`;
-}
 
 
 /***/ }),
@@ -734,7 +696,7 @@ function GetRootPath(targetPath, filePath) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.defaultTargets = exports.defaultExcludeFolders = exports.defaultExcludeFiles = exports.defaultFileTypes = exports.defaultSource = void 0;
 exports.defaultSource = './__tests__/data/source_data/';
-exports.defaultFileTypes = ['test'];
+exports.defaultFileTypes = ['.test'];
 exports.defaultExcludeFiles = ['./__tests__/data/source_data/should_be_ignored.test'];
 exports.defaultExcludeFolders = ['./__tests__/data/source_data/ignorefolder'];
 exports.defaultTargets = ['./__tests__/data/ValidToml.toml', './__tests__/data/ValidReadme.md'];
@@ -743,47 +705,21 @@ exports.defaultTargets = ['./__tests__/data/ValidToml.toml', './__tests__/data/V
 /***/ }),
 
 /***/ 8:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.FileDetails = void 0;
+const path_1 = __nccwpck_require__(622);
 class FileDetails {
     constructor(path) {
-        this.SourcePath = path;
-        this.FileName = this.GetFileName(path);
-        this.Extension = this.GetFileExtension(path);
-        this.Path = this.GetPathToFile(path);
-    }
-    GetPathToFile(path) {
-        /* eslint-disable no-useless-escape */
-        const regex = /^(.+\/)*([^\/]+)*$/gm;
-        /* eslint-enable no-useless-escape */
-        const result = regex.exec(path);
-        if (result !== null && result !== undefined && result.length > 0) {
-            return result[1];
-        }
-        return '';
-    }
-    GetFileName(path) {
-        /* eslint-disable no-useless-escape */
-        const regex = /^(.+\/)*([^\/]+)*$/gm;
-        /* eslint-enable no-useless-escape */
-        const result = regex.exec(path);
-        if (result !== null && result !== undefined && result.length > 0) {
-            return result[2];
-        }
-        return '';
-    }
-    GetFileExtension(path) {
-        const regex = /(?:\.([^.]+))?$/; // Capture file extensions
-        const result = regex.exec(path);
-        if (result !== null && result !== undefined && result.length > 0) {
-            return result[1];
-        }
-        else {
-            return '';
-        }
+        const result = path_1.parse(path);
+        this.FullPath = path;
+        this.Root = result.root;
+        this.Dir = result.dir;
+        this.Base = result.base;
+        this.Name = result.name;
+        this.Ext = result.ext;
     }
 }
 exports.FileDetails = FileDetails;
@@ -798,7 +734,7 @@ exports.FileDetails = FileDetails;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ExcludeFile = exports.IncludeFolder = exports.IncludeFile = void 0;
 function IncludeFile(fileDetails, config) {
-    return !ExcludeFile(fileDetails.SourcePath, config.ExcludeFiles, config.ExcludeFolders) && WhitelistedType(fileDetails.Extension, config.FileTypes);
+    return !ExcludeFile(fileDetails.FullPath, config.ExcludeFiles, config.ExcludeFolders) && WhitelistedType(fileDetails.Ext, config.FileTypes);
 }
 exports.IncludeFile = IncludeFile;
 function IncludeFolder(path, config) {
@@ -1079,11 +1015,11 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.SupportedFormats = void 0;
 exports.SupportedFormats = [
     {
-        Extension: 'md',
+        Ext: '.md',
         Pattern: /^(?!<!--).*\[[^[]+\]\(([^)]+)\)/gm
     },
     {
-        Extension: 'toml',
+        Ext: '.toml',
         Pattern: /^(?!#).*path\s=\s"(.*)"$/gm
     }
 ];
