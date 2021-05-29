@@ -818,7 +818,6 @@ class TargetDataCollector {
         }
     }
     GetTargetData(target, config) {
-        // console.log(`Getting data from: ${target.Path}`);
         const output = [];
         // Read the contents of the file
         const content = ReadFileFromPath(target.FullPath);
@@ -842,7 +841,7 @@ class TargetDataCollector {
             }
             else {
                 const rootPath = (0,external_path_.join)(data.Target.Dir, data.Link);
-                if (this.InTargetScope(rootPath, config.Source) && !ExcludeFile(rootPath, config.ExcludeFiles, config.ExcludeFolders)) {
+                if (!ExcludeFile(rootPath, config.ExcludeFiles, config.ExcludeFolders)) {
                     output.push({
                         Details: new FileDetails(rootPath),
                         RelativePath: data.Link,
@@ -925,20 +924,26 @@ class CrossReferencer {
 
 ;// CONCATENATED MODULE: ./src/IssueLogger.ts
 class IssueLogger {
-    constructor(sourceIssues, targetIssues) {
+    constructor(config, sourceIssues, targetIssues) {
         this.issueIter = 1;
         this.IssueCount = sourceIssues.length + targetIssues.length;
+        this.targetIssuesCount = targetIssues.length;
+        this.sourceIssuesCount = sourceIssues.length;
         this.TargetIssueOutput = '';
         this.SourceIssueOutput = '';
         if (targetIssues.length > 0) {
-            this.TargetIssueOutput += `Link(s) was found in document(s) but does not point to a valid file:\n`;
+            this.TargetIssueOutput += `Existing links issues:`;
             for (const issue of targetIssues) {
-                this.TargetIssueOutput += `\n${this.GetIssueNumber()} Link: ${issue.Path}\n\tDoes not lead to a valid file. Found in document: \n\t\t${issue.InTarget} : Line: ${issue.Line}\n`;
+                this.TargetIssueOutput += `\n${this.GetIssueNumber()} Link: ${issue.Path}\n\tDoes not lead to file within ${config.Source} or its children.\
+                \n\tFound in document: ${issue.InTarget} : Line: ${issue.Line}\n`;
             }
-            this.TargetIssueOutput += '\nPlease fix any typos in the link, or remove the link from the document(s).';
+            this.TargetIssueOutput += `\nTo fix, do one of the following:\
+                \n\t- Fix any typos in the link\
+                \n\t- Make sure the file exist within ${config.Source} or its children\
+                \n\t- Remove the link from the document (If no longer valid)\n`;
         }
         if (sourceIssues.length > 0) {
-            this.SourceIssueOutput += `Following files in folders was not found linked in document(s):\n`;
+            this.SourceIssueOutput += `Missing links issues:`;
             for (const issue of sourceIssues) {
                 this.SourceIssueOutput += `\n${this.GetIssueNumber()} File: ${issue.Path} \n\tIs missing from following document(s):`;
                 for (const missingTarget of issue.MissingTargets) {
@@ -946,17 +951,22 @@ class IssueLogger {
                 }
                 this.SourceIssueOutput += `\n`;
             }
-            this.SourceIssueOutput += `\nPlease add them to the documents listed or remove them from folders.`;
+            this.SourceIssueOutput += `\nTo fix, do one of the following:\
+                \n\t- Add the missing link to the document\
+                \n\t- Remove the file (If no longer valid)\n`;
         }
     }
-    PrintIssues() {
-        if (this.TargetIssueOutput === '' && this.SourceIssueOutput === '') {
-            return;
+    Ouput() {
+        let output = `▼ ▼ ▼ ▼ ${this.IssueCount} ${this.IssueCount === 1 ? 'issue' : 'issues'} need to be fixed ▼ ▼ ▼ ▼`;
+        if (this.targetIssuesCount > 0) {
+            output += `\n${this.TargetIssueOutput}`;
         }
-        console.error(`▼ ▼ ▼ ▼ ${this.IssueCount} issue(s) need to be fixed ▼ ▼ ▼\
-            \n${this.TargetIssueOutput}\
-            \n\n${this.SourceIssueOutput}\
-            \n▲ ▲ ▲ ▲ ▲ ▲ ▲ End of issue(s) ▲ ▲ ▲ ▲ ▲ ▲ ▲`);
+        if (this.sourceIssuesCount > 0) {
+            output += `\n${this.SourceIssueOutput}`;
+        }
+        output += `\nNote: If none of the above fixes are relevant, consider adding the file/folder to this action's ignore-list, but ONLY do so when absolutly necessary.`;
+        output += `\n▲ ▲ ▲ ▲ End of ${this.IssueCount === 1 ? 'issue' : 'issues'} ▲ ▲ ▲ ▲`;
+        return output;
     }
     GetIssueNumber() {
         return `[${this.issueIter++}/${this.IssueCount}] =>`;
@@ -1000,10 +1010,9 @@ function run() {
             // console.log('======= Cross referencing issues =======');
             const crossChecker = new CrossReferencer(sourceData, targetData);
             if (crossChecker.HasIssues) {
-                const output = new IssueLogger(crossChecker.MissingFromTargets, crossChecker.MissingFromSource);
-                // core.setOutput('SourceIssues', output.SourceIssueOutput);
-                output.PrintIssues();
-                core.setFailed('✗ Cross referencing found issues, see output log to fix them');
+                const issues = new IssueLogger(config, crossChecker.MissingFromTargets, crossChecker.MissingFromSource);
+                core.setFailed('✗ Cross referencing found issues, see output below to fix them');
+                console.error(issues.Ouput());
             }
             else {
                 console.log('✓ All checks passes.');

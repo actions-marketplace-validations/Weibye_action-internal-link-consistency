@@ -20,7 +20,6 @@ export class TargetDataCollector {
     }
 
     private GetTargetData(target: ITarget, config: Config): ITargetData[] {
-        // console.log(`Getting data from: ${target.Path}`);
         const output: ITargetData[] = [];
 
         // Read the contents of the file
@@ -45,7 +44,7 @@ export class TargetDataCollector {
                 continue;
             } else {
                 const rootPath = join(data.Target.Dir, data.Link);
-                if (this.InTargetScope(rootPath, config.Source) && !ExcludeFile(rootPath, config.ExcludeFiles, config.ExcludeFolders)) {
+                if (!ExcludeFile(rootPath, config.ExcludeFiles, config.ExcludeFolders)) {
                     output.push({
                         Details: new FileDetails(rootPath),
                         RelativePath: data.Link,
