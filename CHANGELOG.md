@@ -1,8 +1,10 @@
 # Changelog
 
 ## [Unrealeased]
-### Added
-- Action now detects and fails on misplaced files
+
+## [1.1.1]
+### Fixed
+- Action now correctly detects and fails on misplaced files
 ### Changed
 - Improved output log for clarity
 
