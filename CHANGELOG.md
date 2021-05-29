@@ -2,7 +2,9 @@
 
 ## [Unrealeased]
 ### Added
-- Action now detects misplaced files
+- Action now detects and fails on misplaced files
+### Changed
+- Improved output log for clarity
 
 ## [1.1.0]
 ### Added

@@ -1,24 +1,28 @@
+import { Config } from './Config';
 import { IIssueNotInAll, IIssueNotInSource } from './Interfaces';
 
 export class IssueLogger {
-    public TargetIssueOutput: string;
-    public SourceIssueOutput: string;
+    private TargetIssueOutput: string;
+    private targetIssuesCount: number;
+    private SourceIssueOutput: string;
+    private sourceIssuesCount: number;
     public IssueCount: number;
     private issueIter = 1;
 
-    public constructor(sourceIssues: IIssueNotInAll[], targetIssues: IIssueNotInSource[]) {
+    public constructor(config: Config, sourceIssues: IIssueNotInAll[], targetIssues: IIssueNotInSource[]) {
         this.IssueCount = sourceIssues.length + targetIssues.length;
+        this.targetIssuesCount = targetIssues.length;
+        this.sourceIssuesCount = sourceIssues.length;
         this.TargetIssueOutput = '';
         this.SourceIssueOutput = '';
 
         if (targetIssues.length > 0) {
-            this.TargetIssueOutput += `Link(s) was found in document(s) but does not point to a valid file:\n`;
+            // this.TargetIssueOutput +=  //`Link in document does not point to a file inside ${config.Source} or it's children:\n`;
             for (const issue of targetIssues) {
-                this.TargetIssueOutput += `\n${this.GetIssueNumber()} Link: ${issue.Path}\n\tDoes not lead to a valid file. Found in document: \n\t\t${issue.InTarget} : Line: ${
-                    issue.Line
-                }\n`;
+                this.TargetIssueOutput += `\n${this.GetIssueNumber()} Link: ${issue.Path}\n\tDoes not lead to file within ${config.Source} or its children.\
+                \n\tFound in document: ${issue.InTarget} : Line: ${issue.Line}\n`;
             }
-            this.TargetIssueOutput += '\nPlease fix any typos in the link, or remove the link from the document(s).';
+            this.TargetIssueOutput += `\nTo fix: Fix any typos in the link, remove the link from the document, or make sure the file exist within ${config.Source}.`;
         }
 
         if (sourceIssues.length > 0) {
@@ -34,14 +38,17 @@ export class IssueLogger {
         }
     }
 
-    public PrintIssues(): void {
-        if (this.TargetIssueOutput === '' && this.SourceIssueOutput === '') {
-            return;
+    public Ouput(): string {
+
+        let output = `▼ ▼ ▼ ▼ ${this.IssueCount} ${this.IssueCount == 1 ? "issue" : "issues"} need to be fixed ▼ ▼ ▼ ▼`;
+        if (this.targetIssuesCount > 0) {
+            output += `\n${this.TargetIssueOutput}`;
         }
-        console.error(`▼ ▼ ▼ ▼ ${this.IssueCount} issue(s) need to be fixed ▼ ▼ ▼\
-            \n${this.TargetIssueOutput}\
-            \n\n${this.SourceIssueOutput}\
-            \n▲ ▲ ▲ ▲ ▲ ▲ ▲ End of issue(s) ▲ ▲ ▲ ▲ ▲ ▲ ▲`);
+        if (this.sourceIssuesCount > 0) {
+            output += `\n${this.SourceIssueOutput}`
+        }
+        output += `▲ ▲ ▲ ▲ End of ${this.IssueCount == 1 ? "issue" : "issues"} ▲ ▲ ▲ ▲`;
+        return output;
     }
 
     private GetIssueNumber(): string {
