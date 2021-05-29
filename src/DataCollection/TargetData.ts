@@ -20,7 +20,6 @@ export class TargetDataCollector {
     }
 
     private GetTargetData(target: ITarget, config: Config): ITargetData[] {
-        // console.log(`Getting data from: ${target.Path}`);
         const output: ITargetData[] = [];
 
         // Read the contents of the file
