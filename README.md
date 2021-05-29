@@ -25,7 +25,7 @@ run-action:
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@v2
-        - uses: Weibye/action-internal-link-consistency@1.1.0
+        - uses: Weibye/action-internal-link-consistency@1.1.1
             with:
                 source: '__tests__/data/source_data/'
                 targets: '["__tests__/data/ValidToml.toml", "./__tests__/data/ValidReadme.md"]'
