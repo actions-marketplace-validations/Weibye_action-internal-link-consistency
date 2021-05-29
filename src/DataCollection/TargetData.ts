@@ -45,7 +45,7 @@ export class TargetDataCollector {
                 continue;
             } else {
                 const rootPath = join(data.Target.Dir, data.Link);
-                if (this.InTargetScope(rootPath, config.Source) && !ExcludeFile(rootPath, config.ExcludeFiles, config.ExcludeFolders)) {
+                if (!ExcludeFile(rootPath, config.ExcludeFiles, config.ExcludeFolders)) {
                     output.push({
                         Details: new FileDetails(rootPath),
                         RelativePath: data.Link,

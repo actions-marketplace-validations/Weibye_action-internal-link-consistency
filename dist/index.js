@@ -842,7 +842,7 @@ class TargetDataCollector {
             }
             else {
                 const rootPath = (0,external_path_.join)(data.Target.Dir, data.Link);
-                if (this.InTargetScope(rootPath, config.Source) && !ExcludeFile(rootPath, config.ExcludeFiles, config.ExcludeFolders)) {
+                if (!ExcludeFile(rootPath, config.ExcludeFiles, config.ExcludeFolders)) {
                     output.push({
                         Details: new FileDetails(rootPath),
                         RelativePath: data.Link,
