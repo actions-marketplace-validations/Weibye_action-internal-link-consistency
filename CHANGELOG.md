@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unrealeased]
+### Added
+- Action now detects misplaced files
 
 ## [1.1.0]
 ### Added
