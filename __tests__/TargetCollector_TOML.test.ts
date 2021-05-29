@@ -48,15 +48,17 @@ test('Document with content but no relative links should report no results', asy
     }
 });
 
-test('Should not pick up links outside the scope of source', async () => {
+test('Should pick up links outside the scope of source', async () => {
     // Scope is ./__tests__/validData/data/*
     const data = new TargetDataCollector(new Config('./__tests__/data/source_data/', ['./__tests__/data/OutOfScope.toml']));
     expect(data).toBeDefined();
     expect(data.TargetData).toBeDefined();
+    // There should be 1 target
     expect(data.TargetData.length).toEqual(1);
     for (const targetData of data.TargetData) {
+        // Target should have 2 links
         expect(targetData.Data).toBeDefined();
-        expect(targetData.Data.length).toEqual(0);
+        expect(targetData.Data.length).toEqual(2);
     }
 });
 
@@ -83,8 +85,10 @@ test('Links to ignored files should be ignored', async () => {
     );
     expect(data).toBeDefined();
     expect(data.TargetData).toBeDefined();
+    // Should have 1 target
     expect(data.TargetData.length).toEqual(1);
     for (const targetData of data.TargetData) {
+        // Both links in this document should be ignored
         expect(targetData.Data).toBeDefined();
         expect(targetData.Data.length).toEqual(0);
     }
@@ -94,9 +98,11 @@ test('Links to files in ignored folders should be ignored', async () => {
     const data = new TargetDataCollector(new Config(sourcePath, ['./__tests__/data/IgnoreFiles.toml'], [], ['./__tests__/data/source_data/ignorefolder'], []));
     expect(data).toBeDefined();
     expect(data.TargetData).toBeDefined();
+    // Should have 1 target
     expect(data.TargetData.length).toEqual(1);
     for (const targetData of data.TargetData) {
         expect(targetData.Data).toBeDefined();
+        // Both links in this document should be ignored
         expect(targetData.Data.length).toEqual(0);
     }
 });

@@ -48,15 +48,17 @@ test('Document with content but no relative links should report no results', asy
     }
 });
 
-test('Should not pick up links outside the scope of source', async () => {
+test('Should pick up links outside the scope of source', async () => {
     // Scope is ./__tests__/validData/data/*
     const data = new TargetDataCollector(new Config('./__tests__/data/source_data/', ['./__tests__/data/OutOfScope.md']));
     expect(data).toBeDefined();
     expect(data.TargetData).toBeDefined();
+    // Should have 1 target
     expect(data.TargetData.length).toEqual(1);
     for (const targetData of data.TargetData) {
         expect(targetData.Data).toBeDefined();
-        expect(targetData.Data.length).toEqual(0);
+        // Both links in this document should be counted
+        expect(targetData.Data.length).toEqual(2);
     }
 });
 
