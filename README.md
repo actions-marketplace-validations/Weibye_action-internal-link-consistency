@@ -8,9 +8,9 @@ The primary user for this action is [Bevy](https://github.com/bevyengine/bevy), 
 ### How it works
 1. Looks for files recursively within `source` and collects data about the files (source data).
 2. Looks through the documents defined in `targets` and collects data about the links within them (target data).
-3. Cross references source and target data to ensure they agree on the same data.
-4. The action will fail if there are any inconsistencies found.
-If the action fails, the action tries to output helpful messages to guide the user to exactly what needs to be addressed. 
+3. Cross references source and target data
+4. If there are files within `source` that are not found within _all_ `targets`, the action will fail.
+If the action fails, it tries to output helpful messages to guide the user to exactly what needs to be addressed. 
 
 ### Features
 - Can look for specific file-types, or all files within folders.
@@ -25,7 +25,7 @@ run-action:
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@v2
-        - uses: Weibye/action-internal-link-consistency@1.1.1
+        - uses: Weibye/action-internal-link-consistency@1.0.0
             with:
                 source: '__tests__/data/source_data/'
                 targets: '["__tests__/data/ValidToml.toml", "./__tests__/data/ValidReadme.md"]'

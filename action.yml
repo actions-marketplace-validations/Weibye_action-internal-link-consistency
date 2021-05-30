@@ -1,5 +1,5 @@
 name: 'action-internal-link-consistency'
-description: 'Action to cross internal links between folders and documents to ensure they agree on the same data.'
+description: 'Action to check that all files of type in a specific folder are linked in designated documents'
 author: 'Andreas Weibye'
 inputs:
   source:
