@@ -18,13 +18,8 @@ export interface ITargetOutput {
     Data: ITargetData[];
 }
 
-// export interface IIssueNotInAny extends IIssue {}
 export interface IIssueNotInAll extends IPath {
     MissingTargets: string[];
-}
-export interface IIssueNotInSource extends IPath {
-    InTarget: string;
-    Line: number;
 }
 export interface ITargetIssue extends IPath {
     OriginalMatch: string;

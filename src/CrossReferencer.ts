@@ -1,21 +1,18 @@
 import { FileDetails } from './FileDetails';
-import { ITargetOutput, IIssueNotInAll, IIssueNotInSource } from './Interfaces';
+import { ITargetOutput, IIssueNotInAll } from './Interfaces';
 
 export class CrossReferencer {
     // Rules:
     // File should be present in all targets, or there should be created an issue of the appropriate type:
 
     // Issue types:
-    // - Only found in no or some targets: Missing target: list
+    // File is missing from one or more targets
     public MissingFromTargets: IIssueNotInAll[];
-    // - Found in target (target(s)) but not on disk
-    public MissingFromSource: IIssueNotInSource[];
 
     public HasIssues: boolean;
 
     public constructor(sourceData: FileDetails[], targetData: ITargetOutput[]) {
         this.MissingFromTargets = [];
-        this.MissingFromSource = [];
 
         // const clonedSource = [...sourceData];
         const clonedTarget = [...targetData];
@@ -47,16 +44,6 @@ export class CrossReferencer {
             }
         }
 
-        for (const target of clonedTarget) {
-            for (const data of target.Data) {
-                this.MissingFromSource.push({
-                    Path: data.Details.FullPath,
-                    InTarget: data.ParentFile.FullPath,
-                    Line: data.LineNr
-                });
-            }
-        }
-
-        this.HasIssues = this.MissingFromTargets.length + this.MissingFromSource.length > 0;
+        this.HasIssues = this.MissingFromTargets.length > 0;
     }
 }
