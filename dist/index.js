@@ -878,7 +878,6 @@ function GetLineNr(content, charIndex) {
 class CrossReferencer {
     constructor(sourceData, targetData) {
         this.MissingFromTargets = [];
-        this.MissingFromSource = [];
         // const clonedSource = [...sourceData];
         const clonedTarget = [...targetData];
         for (const source of sourceData) {
@@ -909,39 +908,16 @@ class CrossReferencer {
                 this.MissingFromTargets.push({ Path: source.FullPath, MissingTargets: missingFromTarget });
             }
         }
-        for (const target of clonedTarget) {
-            for (const data of target.Data) {
-                this.MissingFromSource.push({
-                    Path: data.Details.FullPath,
-                    InTarget: data.ParentFile.FullPath,
-                    Line: data.LineNr
-                });
-            }
-        }
-        this.HasIssues = this.MissingFromTargets.length + this.MissingFromSource.length > 0;
+        this.HasIssues = this.MissingFromTargets.length > 0;
     }
 }
 
 ;// CONCATENATED MODULE: ./src/IssueLogger.ts
 class IssueLogger {
-    constructor(config, sourceIssues, targetIssues) {
+    constructor(config, sourceIssues) {
         this.issueIter = 1;
-        this.IssueCount = sourceIssues.length + targetIssues.length;
-        this.targetIssuesCount = targetIssues.length;
-        this.sourceIssuesCount = sourceIssues.length;
-        this.TargetIssueOutput = '';
+        this.IssueCount = sourceIssues.length;
         this.SourceIssueOutput = '';
-        if (targetIssues.length > 0) {
-            this.TargetIssueOutput += `Existing links issues:`;
-            for (const issue of targetIssues) {
-                this.TargetIssueOutput += `\n${this.GetIssueNumber()} Link: ${issue.Path}\n\tDoes not lead to file within ${config.Source} or its children.\
-                \n\tFound in document: ${issue.InTarget} : Line: ${issue.Line}\n`;
-            }
-            this.TargetIssueOutput += `\nTo fix, do one of the following:\
-                \n\t- Fix any typos in the link\
-                \n\t- Make sure the file exist within ${config.Source} or its children\
-                \n\t- Remove the link from the document (If no longer valid)\n`;
-        }
         if (sourceIssues.length > 0) {
             this.SourceIssueOutput += `Missing links issues:`;
             for (const issue of sourceIssues) {
@@ -958,12 +934,7 @@ class IssueLogger {
     }
     Ouput() {
         let output = `▼ ▼ ▼ ▼ ${this.IssueCount} ${this.IssueCount === 1 ? 'issue' : 'issues'} need to be fixed ▼ ▼ ▼ ▼`;
-        if (this.targetIssuesCount > 0) {
-            output += `\n${this.TargetIssueOutput}`;
-        }
-        if (this.sourceIssuesCount > 0) {
-            output += `\n${this.SourceIssueOutput}`;
-        }
+        output += `\n${this.SourceIssueOutput}`;
         output += `\nNote: If none of the above fixes are relevant, consider adding the file/folder to this action's ignore-list, but ONLY do so when absolutly necessary.`;
         output += `\n▲ ▲ ▲ ▲ End of ${this.IssueCount === 1 ? 'issue' : 'issues'} ▲ ▲ ▲ ▲`;
         return output;
@@ -1010,7 +981,7 @@ function run() {
             // console.log('======= Cross referencing issues =======');
             const crossChecker = new CrossReferencer(sourceData, targetData);
             if (crossChecker.HasIssues) {
-                const issues = new IssueLogger(config, crossChecker.MissingFromTargets, crossChecker.MissingFromSource);
+                const issues = new IssueLogger(config, crossChecker.MissingFromTargets);
                 core.setFailed('✗ Cross referencing found issues, see output below to fix them');
                 console.error(issues.Ouput());
             }
