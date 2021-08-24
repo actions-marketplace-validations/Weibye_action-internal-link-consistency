@@ -33,7 +33,7 @@
     "author": "Andreas Weibye",
     "license": "MIT",
     "dependencies": {
-        "@actions/core": "^1.4.0"
+        "@actions/core": "^1.5.0"
     },
     "devDependencies": {
         "@types/jest": "^27.0.1",
